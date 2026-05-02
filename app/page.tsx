@@ -216,11 +216,11 @@ function A8EposBanner() {
       <div id="div_admane_async_1734_658_2972" />
 
       <img
-        border={0}
         width={1}
         height={1}
         src="https://www14.a8.net/0.gif?a8mat=4B3G6K+9LWV8Y+38L8+BXYE9"
         alt=""
+ 	style={{ border: 0 }}
       />
     </div>
   );
