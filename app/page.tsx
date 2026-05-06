@@ -1,10 +1,11 @@
 'use client';
 
 import Script from 'next/script';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 declare global {
   interface Window {
+    gtag?: (...args: any[]) => void;
     brandsafe_js_async?: (
       url: string,
       query: string,
@@ -14,172 +15,365 @@ declare global {
   }
 }
 
-type Answer = {
-  job: string;
-  anxiety: string;
-  urgent: string;
-  priority: string;
+type AnswerKey = 'job' | 'anxiety' | 'urgent' | 'priority';
+
+type Answers = Record<AnswerKey, string>;
+
+const initialAnswers: Answers = {
+  job: '',
+  anxiety: '',
+  urgent: '',
+  priority: '',
 };
 
-export default function Home() {
-  const [answers, setAnswers] = useState<Answer>({
-    job: '',
-    anxiety: '',
-    urgent: '',
-    priority: '',
+const questions: {
+  key: AnswerKey;
+  title: string;
+  choices: { label: string; value: string; hint?: string }[];
+}[] = [
+  {
+    key: 'job',
+    title: 'Q1. 現在の状況は？',
+    choices: [
+      { label: '主婦・主夫', value: 'housewife' },
+      { label: '学生', value: 'student' },
+      { label: 'フリーター', value: 'freeter' },
+      { label: '会社員', value: 'worker' },
+    ],
+  },
+  {
+    key: 'anxiety',
+    title: 'Q2. カード審査に不安はありますか？',
+    choices: [
+      { label: 'かなり不安', value: 'yes', hint: '通るか心配' },
+      { label: 'そこまで不安はない', value: 'no' },
+    ],
+  },
+  {
+    key: 'urgent',
+    title: 'Q3. いつまでに使いたいですか？',
+    choices: [
+      { label: '今日〜数日以内に使いたい', value: 'yes' },
+      { label: '急ぎではない', value: 'no' },
+    ],
+  },
+  {
+    key: 'priority',
+    title: 'Q4. いちばん重視するものは？',
+    choices: [
+      { label: '申し込みやすさ', value: 'easy' },
+      { label: '年会費無料', value: 'free' },
+      { label: 'すぐ使える可能性', value: 'speed' },
+    ],
+  },
+];
+
+function getSrc() {
+  if (typeof window === 'undefined') return 'direct';
+  const params = new URLSearchParams(window.location.search);
+  return params.get('src') || 'direct';
+}
+
+function track(eventName: string, params: Record<string, any> = {}) {
+  if (typeof window === 'undefined') return;
+
+  const src = getSrc();
+
+  window.gtag?.('event', eventName, {
+    src,
+    page_type: 'diagnosis_lp',
+    card_name: 'epos',
+    ...params,
   });
+}
 
-  const [result, setResult] = useState(false);
+export default function Home() {
+  const [answers, setAnswers] = useState<Answers>(initialAnswers);
+  const [showResult, setShowResult] = useState(false);
   const [error, setError] = useState('');
+  const [src, setSrc] = useState('direct');
 
-  const select = (key: keyof Answer, value: string) => {
-    setAnswers({ ...answers, [key]: value });
+  const answeredCount = Object.values(answers).filter(Boolean).length;
+  const progress = answeredCount / questions.length;
+
+  useEffect(() => {
+    const currentSrc = getSrc();
+    setSrc(currentSrc);
+
+    track('diagnosis_lp_view', {
+      src: currentSrc,
+    });
+  }, []);
+
+  const diagnosisType = useMemo(() => {
+    if (answers.urgent === 'yes') return 'speed';
+    if (answers.anxiety === 'yes') return 'easy';
+    if (answers.priority === 'free') return 'free';
+    return 'standard';
+  }, [answers]);
+
+  const select = (key: AnswerKey, value: string) => {
+    setAnswers((prev) => ({ ...prev, [key]: value }));
     setError('');
+
+    track('diagnosis_answer_select', {
+      question_key: key,
+      answer_value: value,
+    });
   };
 
   const diagnose = () => {
-    if (!answers.job || !answers.anxiety || !answers.urgent || !answers.priority) {
+    track('diagnosis_button_click', {
+      answered_count: answeredCount,
+    });
+
+    if (answeredCount < questions.length) {
       setError('すべての質問を選択してください。');
+      track('diagnosis_error', {
+        error_type: 'incomplete_answers',
+      });
       return;
     }
 
-    setResult(true);
+    setShowResult(true);
+
+    track('diagnosis_result_view', {
+      diagnosis_type: diagnosisType,
+      job: answers.job,
+      anxiety: answers.anxiety,
+      urgent: answers.urgent,
+      priority: answers.priority,
+      recommended_card: 'epos',
+    });
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const progress =
-    Object.values(answers).filter(Boolean).length / Object.keys(answers).length;
+  const reset = () => {
+    track('diagnosis_retry_click', {
+      diagnosis_type: diagnosisType,
+    });
+
+    setAnswers(initialAnswers);
+    setShowResult(false);
+    setError('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-emerald-50 via-white to-slate-100 px-5 py-8">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50 px-4 py-6 text-slate-900">
       <div className="mx-auto max-w-3xl">
-        <div className="mb-6 text-center">
-          <p className="text-sm font-bold tracking-widest text-emerald-600">
-            cardcheck.jp
-          </p>
-          <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
-            クレジットカード無料診断
-          </h1>
-          <p className="mt-4 text-slate-600">
-            30秒であなたに合うカードを診断。審査に不安がある方でも選びやすいカードを提案します。
-          </p>
-        </div>
+        <AffiliateNotice />
 
-        <div className="rounded-3xl bg-white p-6 shadow-xl">
-          {!result && (
-            <>
-              <div className="mb-8">
-                <div className="mb-2 flex justify-between text-sm font-bold text-slate-600">
-                  <span>診断進捗</span>
-                  <span>{Math.round(progress * 100)}%</span>
-                </div>
-                <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full rounded-full bg-emerald-500 transition-all"
-                    style={{ width: `${progress * 100}%` }}
-                  />
-                </div>
+        {!showResult ? (
+          <>
+            <Hero src={src} />
+
+            <section className="mt-6 rounded-3xl bg-white p-5 shadow-xl ring-1 ring-slate-100">
+              <Progress progress={progress} answeredCount={answeredCount} />
+
+              <div className="mt-7 space-y-7">
+                {questions.map((q) => (
+                  <Question key={q.key} title={q.title}>
+                    {q.choices.map((choice) => (
+                      <Choice
+                        key={choice.value}
+                        selected={answers[q.key] === choice.value}
+                        onClick={() => select(q.key, choice.value)}
+                      >
+                        <span>{choice.label}</span>
+                        {choice.hint && (
+                          <small className="mt-1 block text-xs font-medium text-slate-500">
+                            {choice.hint}
+                          </small>
+                        )}
+                      </Choice>
+                    ))}
+                  </Question>
+                ))}
               </div>
 
-              <div className="space-y-8">
-                <Question title="Q1. 現在の状況は？">
-                  <Choice onClick={() => select('job', 'housewife')} selected={answers.job === 'housewife'}>主婦</Choice>
-                  <Choice onClick={() => select('job', 'student')} selected={answers.job === 'student'}>学生</Choice>
-                  <Choice onClick={() => select('job', 'freeter')} selected={answers.job === 'freeter'}>フリーター</Choice>
-                  <Choice onClick={() => select('job', 'worker')} selected={answers.job === 'worker'}>会社員</Choice>
-                </Question>
-
-                <Question title="Q2. 審査に不安はありますか？">
-                  <Choice onClick={() => select('anxiety', 'yes')} selected={answers.anxiety === 'yes'}>ある</Choice>
-                  <Choice onClick={() => select('anxiety', 'no')} selected={answers.anxiety === 'no'}>ない</Choice>
-                </Question>
-
-                <Question title="Q3. すぐに使いたいですか？">
-                  <Choice onClick={() => select('urgent', 'yes')} selected={answers.urgent === 'yes'}>今日〜数日以内に使いたい</Choice>
-                  <Choice onClick={() => select('urgent', 'no')} selected={answers.urgent === 'no'}>急ぎではない</Choice>
-                </Question>
-
-                <Question title="Q4. 重視するものは？">
-                  <Choice onClick={() => select('priority', 'easy')} selected={answers.priority === 'easy'}>申し込みやすさ</Choice>
-                  <Choice onClick={() => select('priority', 'point')} selected={answers.priority === 'point'}>ポイント還元</Choice>
-                  <Choice onClick={() => select('priority', 'convenience')} selected={answers.priority === 'convenience'}>コンビニ利用</Choice>
-                </Question>
-
-                {error && (
-                  <div className="rounded-2xl bg-red-50 p-4 text-center text-sm font-bold text-red-600">
-                    {error}
-                  </div>
-                )}
-
-                <button
-                  onClick={diagnose}
-                  className="w-full rounded-2xl bg-emerald-500 px-6 py-4 text-lg font-bold text-white shadow-lg transition hover:bg-emerald-600"
-                >
-                  診断結果を見る
-                </button>
-              </div>
-            </>
-          )}
-
-          {result && (
-            <section className="rounded-3xl border bg-emerald-50 p-6">
-              <p className="text-sm font-bold text-emerald-700">
-                あなたにおすすめ
-              </p>
-
-              <h2 className="mt-2 text-4xl font-extrabold text-slate-900">
-                エポスカード
-              </h2>
-
-              <p className="mt-4 leading-8 text-slate-700">
-                審査に不安がある方や、すぐに使いたい方に向いています。
-                最短即日発行に対応しているため、初めての1枚としても選ばれやすいカードです。
-              </p>
-
-              <div className="mt-6 grid gap-3">
-                <div className="rounded-2xl bg-white p-4 font-semibold text-slate-700">
-                  ✅ 年会費無料
+              {error && (
+                <div className="mt-6 rounded-2xl bg-red-50 p-4 text-center text-sm font-bold text-red-600">
+                  {error}
                 </div>
-                <div className="rounded-2xl bg-white p-4 font-semibold text-slate-700">
-                  ✅ 最短即日発行に対応
-                </div>
-                <div className="rounded-2xl bg-white p-4 font-semibold text-slate-700">
-                  ✅ 審査に不安がある方にも選ばれやすい
-                </div>
-              </div>
-
-              <div className="mt-6 rounded-2xl bg-white p-4 text-sm text-slate-600">
-                ※この診断は一般的な傾向をもとにした目安です。審査結果を保証するものではありません。
-              </div>
-
-              <div className="mt-6 rounded-3xl bg-white p-5 shadow">
-                <p className="text-center font-bold text-slate-900">
-                  まずは公式サイトで条件を確認してください
-                </p>
-                <p className="mt-2 text-center text-sm text-slate-600">
-                  最短当日で利用できる可能性があります。
-                </p>
-
-                <div className="mt-4 flex justify-center">
-                  <A8EposBanner />
-                </div>
-
-                <p className="mt-3 text-center text-xs text-slate-500">
-                  ※A8.netの広告リンクを使用しています
-                </p>
-              </div>
+              )}
 
               <button
-                onClick={() => setResult(false)}
-                className="mt-6 w-full rounded-2xl border bg-white px-6 py-3 font-bold transition hover:bg-slate-50"
+                onClick={diagnose}
+                className="mt-7 w-full rounded-2xl bg-emerald-600 px-6 py-4 text-lg font-extrabold text-white shadow-lg transition hover:bg-emerald-700"
               >
-                もう一度診断する
+                診断結果を見る
               </button>
+
+              <p className="mt-3 text-center text-xs text-slate-500">
+                診断は無料です。審査結果を保証するものではありません。
+              </p>
             </section>
-          )}
-        </div>
+          </>
+        ) : (
+          <ResultSection
+            diagnosisType={diagnosisType}
+            onReset={reset}
+          />
+        )}
       </div>
     </main>
+  );
+}
+
+function Hero({ src }: { src: string }) {
+  return (
+    <header className="pt-4 text-center">
+      <p className="text-xs font-extrabold tracking-[0.25em] text-emerald-600">
+        cardcheck.jp
+      </p>
+
+      <h1 className="mt-3 text-3xl font-black leading-tight tracking-tight sm:text-4xl">
+        あなたに合う
+        <br />
+        クレジットカードを30秒診断
+      </h1>
+
+      <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
+        審査が不安、すぐ使いたい、年会費無料がいい。
+        あなたの状況に合わせて、今申し込める候補をわかりやすく表示します。
+      </p>
+
+      <div className="mt-5 grid grid-cols-3 gap-2 text-xs font-bold text-slate-700">
+        <div className="rounded-2xl bg-white p-3 shadow-sm">無料診断</div>
+        <div className="rounded-2xl bg-white p-3 shadow-sm">30秒</div>
+        <div className="rounded-2xl bg-white p-3 shadow-sm">初心者向け</div>
+      </div>
+
+      <p className="mt-3 text-xs text-slate-400">
+        流入元：{src}
+      </p>
+    </header>
+  );
+}
+
+function AffiliateNotice() {
+  return (
+    <div className="rounded-2xl bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-900 ring-1 ring-amber-100">
+      <b>広告・PRについて：</b>
+      当サイトはアフィリエイト広告を利用しています。診断結果は一般的な傾向をもとにした目安であり、審査通過や発行を保証するものではありません。
+    </div>
+  );
+}
+
+function Progress({
+  progress,
+  answeredCount,
+}: {
+  progress: number;
+  answeredCount: number;
+}) {
+  return (
+    <div>
+      <div className="mb-2 flex justify-between text-sm font-bold text-slate-600">
+        <span>診断進捗</span>
+        <span>
+          {answeredCount}/4問・{Math.round(progress * 100)}%
+        </span>
+      </div>
+      <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+        <div
+          className="h-full rounded-full bg-emerald-500 transition-all"
+          style={{ width: `${progress * 100}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ResultSection({
+  diagnosisType,
+  onReset,
+}: {
+  diagnosisType: string;
+  onReset: () => void;
+}) {
+  return (
+    <section className="mt-6">
+      <div className="rounded-3xl bg-white p-5 shadow-xl ring-1 ring-slate-100">
+        <div className="rounded-3xl bg-emerald-50 p-5">
+          <p className="text-sm font-extrabold text-emerald-700">診断結果</p>
+
+          <h2 className="mt-2 text-2xl font-black leading-tight sm:text-4xl">
+            あなたには
+            <br />
+            エポスカードが向いています
+          </h2>
+
+          <div className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-bold text-emerald-700">
+            {getDiagnosisLabel(diagnosisType)}
+          </div>
+
+          <p className="mt-5 text-lg font-extrabold leading-8">
+            年会費無料で、初めての1枚としても選びやすいカードです。
+          </p>
+
+          <p className="mt-3 leading-8 text-slate-700">
+            エポスカードは年会費無料で、最短即日発行にも対応しています。
+            審査に不安がある方や、早めにカードを用意したい方の候補になります。
+          </p>
+        </div>
+
+        <div className="mt-5 grid gap-3">
+          <Benefit>年会費無料</Benefit>
+          <Benefit>最短即日発行に対応</Benefit>
+          <Benefit>初めてのクレジットカードとして選びやすい</Benefit>
+        </div>
+
+        <div className="mt-5 rounded-2xl bg-slate-50 p-4 text-sm leading-7 text-slate-600">
+          ※この診断は一般的な傾向をもとにした目安です。
+          <br />
+          ※審査結果・発行スピードを保証するものではありません。
+          <br />
+          ※最新の条件・特典・発行可否は必ず公式サイトでご確認ください。
+        </div>
+
+        <div className="mt-6 rounded-3xl bg-white p-5 text-center shadow ring-1 ring-slate-100">
+          <p className="font-black">
+            まずは公式サイトで条件を確認してください
+          </p>
+          <p className="mt-2 text-sm text-slate-600">
+            申し込み前に、最新の発行条件・特典内容を確認できます。
+          </p>
+
+          <div className="mt-4 flex justify-center">
+            <A8EposBanner />
+          </div>
+
+          <p className="mt-3 text-xs text-slate-500">
+            ※A8.netの広告リンクを使用しています
+          </p>
+        </div>
+
+        <button
+          onClick={onReset}
+          className="mt-6 w-full rounded-2xl border bg-white px-6 py-3 font-bold transition hover:bg-slate-50"
+        >
+          もう一度診断する
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function getDiagnosisLabel(type: string) {
+  if (type === 'speed') return '急ぎで使いたい人向け';
+  if (type === 'easy') return '審査が不安な人向け';
+  if (type === 'free') return '年会費無料重視向け';
+  return 'バランス重視向け';
+}
+
+function Benefit({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl bg-slate-50 p-4 font-bold text-slate-700">
+      ✅ {children}
+    </div>
   );
 }
 
@@ -199,6 +393,11 @@ function A8EposBanner() {
       '260501420581',
       '4B3G6K+9LWV8Y+38L8+BXYE9'
     );
+
+    track('epos_banner_view', {
+      cta_position: 'result_main',
+      affiliate_network: 'a8',
+    });
   };
 
   useEffect(() => {
@@ -206,7 +405,16 @@ function A8EposBanner() {
   }, []);
 
   return (
-    <div className="text-center">
+    <div
+      className="text-center"
+      onClick={() => {
+        track('epos_banner_click', {
+          cta_position: 'result_main',
+          affiliate_network: 'a8',
+          click_type: 'banner_area',
+        });
+      }}
+    >
       <Script
         src="https://ad-verification.a8.net/ad/js/brandsafe.js"
         strategy="afterInteractive"
@@ -220,7 +428,7 @@ function A8EposBanner() {
         height={1}
         src="https://www14.a8.net/0.gif?a8mat=4B3G6K+9LWV8Y+38L8+BXYE9"
         alt=""
- 	style={{ border: 0 }}
+        style={{ border: 0 }}
       />
     </div>
   );
@@ -235,7 +443,7 @@ function Question({
 }) {
   return (
     <div>
-      <h2 className="text-lg font-bold text-slate-900">{title}</h2>
+      <h2 className="text-lg font-black text-slate-900">{title}</h2>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">{children}</div>
     </div>
   );
@@ -253,10 +461,10 @@ function Choice({
   return (
     <button
       onClick={onClick}
-      className={`rounded-2xl border px-4 py-3 text-left font-semibold transition ${
+      className={`rounded-2xl border px-4 py-4 text-left font-bold transition ${
         selected
-          ? 'border-emerald-500 bg-emerald-100 text-emerald-800'
-          : 'bg-white hover:bg-slate-100'
+          ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-sm'
+          : 'border-slate-200 bg-white hover:bg-slate-50'
       }`}
     >
       {children}
