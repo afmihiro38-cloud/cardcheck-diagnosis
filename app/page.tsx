@@ -280,6 +280,14 @@ function Hero({ src, onStart }: { src: string; onStart: () => void }) {
           初心者向けに、選びやすいカード候補をわかりやすく表示します。
         </p>
 
+        <div className="mt-6 overflow-hidden rounded-[28px] border border-emerald-100 bg-[#f4f8f3]">
+  <img
+    src="/images/diagnosis-hero.png"
+    alt="クレジットカード無料診断"
+    className="h-auto w-full object-cover"
+  />
+</div>
+        
         <div className="mt-5 grid grid-cols-3 gap-2 text-xs font-bold text-[#0f5f45]">
           <div className="rounded-2xl bg-[#f4f8f3] p-3 text-center">完全無料</div>
           <div className="rounded-2xl bg-[#f4f8f3] p-3 text-center">最短30秒</div>
@@ -395,6 +403,13 @@ function ChoiceCard({
 function LoadingDiagnosis() {
   return (
     <section className="mt-6 rounded-[28px] bg-white p-8 text-center shadow-xl ring-1 ring-emerald-100">
+      <div className="mb-6 overflow-hidden rounded-[24px]">
+  <img
+    src="/images/diagnosis-loading.png"
+    alt="診断中"
+    className="mx-auto h-auto w-full max-w-md"
+  />
+</div>
       <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-emerald-100 border-t-[#0f5f45]" />
 
       <p className="mt-6 text-sm font-black tracking-widest text-[#0f5f45]">
@@ -424,6 +439,13 @@ function ResultSection({
   return (
     <section className="mt-6">
       <div className="rounded-[28px] bg-white p-5 shadow-xl ring-1 ring-emerald-100">
+        <div className="mb-5 overflow-hidden rounded-[28px] border border-emerald-100 bg-white">
+  <img
+    src="/images/diagnosis-result.png"
+    alt="診断レポート"
+    className="h-auto w-full object-cover"
+  />
+</div>
         <div className="rounded-[24px] bg-[#ecf6ef] p-5">
           <p className="text-center text-sm font-black text-[#0f5f45]">
             診断レポート
