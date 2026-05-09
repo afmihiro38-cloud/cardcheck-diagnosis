@@ -262,46 +262,37 @@ export default function Home() {
 function Hero({ src, onStart }: { src: string; onStart: () => void }) {
   return (
     <header className="pt-5">
-      <div className="rounded-[30px] bg-white p-5 shadow-xl ring-1 ring-emerald-100">
-        <p className="text-xs font-black tracking-[0.25em] text-[#0f5f45]">
-          cardcheck.jp
-        </p>
+      <div className="overflow-hidden rounded-[30px] bg-white shadow-xl ring-1 ring-emerald-100">
+        <img
+          src="/images/diagnosis-hero.png"
+          alt="あなたに合うクレジットカードを30秒で無料診断"
+          className="h-auto w-full object-cover"
+        />
 
-        <h1 className="mt-4 text-3xl font-black leading-tight tracking-tight sm:text-4xl">
-          審査が不安でも、
-          <br />
-          あなたに合うカードを
-          <br />
-          <span className="text-[#0f5f45]">30秒で無料診断</span>
-        </h1>
+        <div className="p-5">
+          <button
+            onClick={onStart}
+            className="w-full rounded-2xl bg-[#0f5f45] px-6 py-4 text-lg font-black text-white shadow-lg transition hover:bg-[#0b4d38]"
+          >
+            30秒で無料診断を始める
+          </button>
 
-        <p className="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
-          主婦・学生・フリーター・初めての方にも対応。
-          初心者向けに、選びやすいカード候補をわかりやすく表示します。
-        </p>
+          <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs font-bold text-[#0f5f45]">
+            <div className="rounded-2xl bg-[#f4f8f3] p-3">
+              完全無料
+            </div>
+            <div className="rounded-2xl bg-[#f4f8f3] p-3">
+              個人情報不要
+            </div>
+            <div className="rounded-2xl bg-[#f4f8f3] p-3">
+              何度でもOK
+            </div>
+          </div>
 
-        <div className="mt-6 overflow-hidden rounded-[28px] border border-emerald-100 bg-[#f4f8f3]">
-  <img
-    src="/images/diagnosis-hero.png"
-    alt="クレジットカード無料診断"
-    className="h-auto w-full object-cover"
-  />
-</div>
-        
-        <div className="mt-5 grid grid-cols-3 gap-2 text-xs font-bold text-[#0f5f45]">
-          <div className="rounded-2xl bg-[#f4f8f3] p-3 text-center">完全無料</div>
-          <div className="rounded-2xl bg-[#f4f8f3] p-3 text-center">最短30秒</div>
-          <div className="rounded-2xl bg-[#f4f8f3] p-3 text-center">初心者向け</div>
+          <p className="mt-3 text-center text-xs text-slate-400">
+            流入元：{src}
+          </p>
         </div>
-
-        <button
-          onClick={onStart}
-          className="mt-6 w-full rounded-2xl bg-[#0f5f45] px-6 py-4 text-lg font-black text-white shadow-lg transition hover:bg-[#0b4d38]"
-        >
-          自分に合うカードを無料診断
-        </button>
-
-        <p className="mt-3 text-center text-xs text-slate-400">流入元：{src}</p>
       </div>
     </header>
   );
