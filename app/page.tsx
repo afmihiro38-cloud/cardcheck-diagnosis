@@ -272,22 +272,28 @@ function Hero({ src, onStart }: { src: string; onStart: () => void }) {
         <div className="p-5">
           <button
             onClick={onStart}
-            className="w-full rounded-2xl bg-[#0f5f45] px-6 py-4 text-lg font-black text-white shadow-lg transition hover:bg-[#0b4d38]"
+            className="w-full rounded-2xl bg-yellow-300 px-6 py-4 text-lg font-black text-[#063f2e] shadow-lg transition hover:bg-[#0b4d38]"
           >
-            30秒で無料診断を始める
+            30秒で自分向けカードを診断
           </button>
 
-          <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs font-bold text-[#0f5f45]">
-            <div className="rounded-2xl bg-[#f4f8f3] p-3">
-              完全無料
-            </div>
-            <div className="rounded-2xl bg-[#f4f8f3] p-3">
-              個人情報不要
-            </div>
-            <div className="rounded-2xl bg-[#f4f8f3] p-3">
-              何度でもOK
-            </div>
-          </div>
+<div className="mt-4 grid grid-cols-2 gap-2 text-center text-xs font-bold text-[#0f5f45] sm:grid-cols-4">
+  <div className="rounded-2xl bg-[#f4f8f3] p-3">
+    ✓ 完全無料
+  </div>
+
+  <div className="rounded-2xl bg-[#f4f8f3] p-3">
+    ✓ 個人情報不要
+  </div>
+
+  <div className="rounded-2xl bg-[#f4f8f3] p-3">
+    ✓ 30秒で完了
+  </div>
+
+  <div className="rounded-2xl bg-[#f4f8f3] p-3">
+    ✓ しつこい勧誘なし
+  </div>
+</div>
 
           <p className="mt-3 text-center text-xs text-slate-400">
             流入元：{src}
