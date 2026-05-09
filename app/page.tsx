@@ -16,7 +16,6 @@ declare global {
 }
 
 type AnswerKey = 'job' | 'anxiety' | 'urgent' | 'priority';
-
 type Answers = Record<AnswerKey, string>;
 
 const initialAnswers: Answers = {
@@ -26,14 +25,11 @@ const initialAnswers: Answers = {
   priority: '',
 };
 
-const questions: {
-  key: AnswerKey;
-  title: string;
-  choices: { label: string; value: string; hint?: string }[];
-}[] = [
+const questions = [
   {
-    key: 'job',
-    title: 'Q1. 現在の状況は？',
+    key: 'job' as AnswerKey,
+    step: 'STEP 1 / 4',
+    title: '現在の状況を教えてください',
     choices: [
       { label: '主婦・主夫', value: 'housewife' },
       { label: '学生', value: 'student' },
@@ -42,28 +38,31 @@ const questions: {
     ],
   },
   {
-    key: 'anxiety',
-    title: 'Q2. カード審査に不安はありますか？',
+    key: 'anxiety' as AnswerKey,
+    step: 'STEP 2 / 4',
+    title: 'カード審査に不安はありますか？',
     choices: [
-      { label: 'かなり不安', value: 'yes', hint: '通るか心配' },
+      { label: 'かなり不安', value: 'yes' },
       { label: 'そこまで不安はない', value: 'no' },
     ],
   },
   {
-    key: 'urgent',
-    title: 'Q3. いつまでに使いたいですか？',
+    key: 'urgent' as AnswerKey,
+    step: 'STEP 3 / 4',
+    title: 'いつまでに使いたいですか？',
     choices: [
       { label: '今日〜数日以内に使いたい', value: 'yes' },
       { label: '急ぎではない', value: 'no' },
     ],
   },
   {
-    key: 'priority',
-    title: 'Q4. いちばん重視するものは？',
+    key: 'priority' as AnswerKey,
+    step: 'STEP 4 / 4',
+    title: 'いちばん重視するものは？',
     choices: [
       { label: '申し込みやすさ', value: 'easy' },
       { label: '年会費無料', value: 'free' },
-      { label: 'すぐ使える可能性', value: 'speed' },
+      { label: '早く使える可能性', value: 'speed' },
     ],
   },
 ];
@@ -77,14 +76,26 @@ function getSrc() {
 function track(eventName: string, params: Record<string, any> = {}) {
   if (typeof window === 'undefined') return;
 
-  const src = getSrc();
-
   window.gtag?.('event', eventName, {
-    src,
+    src: getSrc(),
     page_type: 'diagnosis_lp',
     card_name: 'epos',
     ...params,
   });
+}
+
+function getDiagnosisType(answers: Answers) {
+  if (answers.urgent === 'yes') return 'speed';
+  if (answers.anxiety === 'yes') return 'easy';
+  if (answers.priority === 'free') return 'free';
+  return 'beginner';
+}
+
+function getDiagnosisLabel(type: string) {
+  if (type === 'speed') return '急ぎで使いたい人向け';
+  if (type === 'easy') return '審査が不安な人向け';
+  if (type === 'free') return '年会費無料重視向け';
+  return '初心者向け';
 }
 
 export default function Home() {
@@ -96,6 +107,8 @@ export default function Home() {
   const answeredCount = Object.values(answers).filter(Boolean).length;
   const progress = answeredCount / questions.length;
 
+  const diagnosisType = useMemo(() => getDiagnosisType(answers), [answers]);
+
   useEffect(() => {
     const currentSrc = getSrc();
     setSrc(currentSrc);
@@ -104,13 +117,6 @@ export default function Home() {
       src: currentSrc,
     });
   }, []);
-
-  const diagnosisType = useMemo(() => {
-    if (answers.urgent === 'yes') return 'speed';
-    if (answers.anxiety === 'yes') return 'easy';
-    if (answers.priority === 'free') return 'free';
-    return 'standard';
-  }, [answers]);
 
   const select = (key: AnswerKey, value: string) => {
     setAnswers((prev) => ({ ...prev, [key]: value }));
@@ -139,11 +145,11 @@ export default function Home() {
 
     track('diagnosis_result_view', {
       diagnosis_type: diagnosisType,
+      recommended_card: 'epos',
       job: answers.job,
       anxiety: answers.anxiety,
       urgent: answers.urgent,
       priority: answers.priority,
-      recommended_card: 'epos',
     });
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -161,7 +167,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50 px-4 py-6 text-slate-900">
+    <main className="min-h-screen bg-[#f4f8f3] px-4 py-5 text-slate-900">
       <div className="mx-auto max-w-3xl">
         <AffiliateNotice />
 
@@ -169,24 +175,30 @@ export default function Home() {
           <>
             <Hero src={src} />
 
-            <section className="mt-6 rounded-3xl bg-white p-5 shadow-xl ring-1 ring-slate-100">
+            <section className="mt-6 rounded-[28px] bg-white p-5 shadow-xl ring-1 ring-emerald-100">
               <Progress progress={progress} answeredCount={answeredCount} />
+
+              <div className="mt-6 rounded-2xl bg-emerald-50 p-4">
+                <p className="text-sm font-bold text-emerald-900">
+                  こんな方におすすめ
+                </p>
+                <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
+                  <li>✓ 審査に通るか不安</li>
+                  <li>✓ 初めてでカード選びが分からない</li>
+                  <li>✓ 年会費無料のカードを探している</li>
+                </ul>
+              </div>
 
               <div className="mt-7 space-y-7">
                 {questions.map((q) => (
-                  <Question key={q.key} title={q.title}>
+                  <Question key={q.key} step={q.step} title={q.title}>
                     {q.choices.map((choice) => (
                       <Choice
                         key={choice.value}
                         selected={answers[q.key] === choice.value}
                         onClick={() => select(q.key, choice.value)}
                       >
-                        <span>{choice.label}</span>
-                        {choice.hint && (
-                          <small className="mt-1 block text-xs font-medium text-slate-500">
-                            {choice.hint}
-                          </small>
-                        )}
+                        {choice.label}
                       </Choice>
                     ))}
                   </Question>
@@ -201,9 +213,9 @@ export default function Home() {
 
               <button
                 onClick={diagnose}
-                className="mt-7 w-full rounded-2xl bg-emerald-600 px-6 py-4 text-lg font-extrabold text-white shadow-lg transition hover:bg-emerald-700"
+                className="mt-7 w-full rounded-2xl bg-[#0f5f45] px-6 py-4 text-lg font-black text-white shadow-lg transition hover:bg-[#0b4d38]"
               >
-                診断結果を見る
+                無料で診断結果を見る
               </button>
 
               <p className="mt-3 text-center text-xs text-slate-500">
@@ -212,10 +224,7 @@ export default function Home() {
             </section>
           </>
         ) : (
-          <ResultSection
-            diagnosisType={diagnosisType}
-            onReset={reset}
-          />
+          <ResultSection diagnosisType={diagnosisType} onReset={reset} />
         )}
       </div>
     </main>
@@ -224,31 +233,31 @@ export default function Home() {
 
 function Hero({ src }: { src: string }) {
   return (
-    <header className="pt-4 text-center">
-      <p className="text-xs font-extrabold tracking-[0.25em] text-emerald-600">
+    <header className="pt-5 text-center">
+      <p className="text-xs font-black tracking-[0.25em] text-[#0f5f45]">
         cardcheck.jp
       </p>
 
       <h1 className="mt-3 text-3xl font-black leading-tight tracking-tight sm:text-4xl">
-        あなたに合う
+        審査が不安でも、
         <br />
-        クレジットカードを30秒診断
+        あなたに合うカードを
+        <br />
+        30秒で無料診断
       </h1>
 
       <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
-        審査が不安、すぐ使いたい、年会費無料がいい。
-        あなたの状況に合わせて、今申し込める候補をわかりやすく表示します。
+        主婦・学生・フリーター・初めての方にも対応。
+        初心者向けに、選びやすいカード候補をわかりやすく表示します。
       </p>
 
-      <div className="mt-5 grid grid-cols-3 gap-2 text-xs font-bold text-slate-700">
-        <div className="rounded-2xl bg-white p-3 shadow-sm">無料診断</div>
+      <div className="mt-5 grid grid-cols-3 gap-2 text-xs font-bold text-[#0f5f45]">
+        <div className="rounded-2xl bg-white p-3 shadow-sm">無料</div>
         <div className="rounded-2xl bg-white p-3 shadow-sm">30秒</div>
         <div className="rounded-2xl bg-white p-3 shadow-sm">初心者向け</div>
       </div>
 
-      <p className="mt-3 text-xs text-slate-400">
-        流入元：{src}
-      </p>
+      <p className="mt-3 text-xs text-slate-400">流入元：{src}</p>
     </header>
   );
 }
@@ -279,7 +288,7 @@ function Progress({
       </div>
       <div className="h-3 overflow-hidden rounded-full bg-slate-100">
         <div
-          className="h-full rounded-full bg-emerald-500 transition-all"
+          className="h-full rounded-full bg-[#0f5f45] transition-all"
           style={{ width: `${progress * 100}%` }}
         />
       </div>
@@ -296,34 +305,42 @@ function ResultSection({
 }) {
   return (
     <section className="mt-6">
-      <div className="rounded-3xl bg-white p-5 shadow-xl ring-1 ring-slate-100">
-        <div className="rounded-3xl bg-emerald-50 p-5">
-          <p className="text-sm font-extrabold text-emerald-700">診断結果</p>
+      <div className="rounded-[28px] bg-white p-5 shadow-xl ring-1 ring-emerald-100">
+        <div className="rounded-[24px] bg-[#ecf6ef] p-5">
+          <p className="text-sm font-black text-[#0f5f45]">診断結果</p>
 
           <h2 className="mt-2 text-2xl font-black leading-tight sm:text-4xl">
-            あなたには
+            あなたは
             <br />
-            エポスカードが向いています
+            「{getDiagnosisLabel(diagnosisType)}」
+            <br />
+            です
           </h2>
 
-          <div className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-bold text-emerald-700">
-            {getDiagnosisLabel(diagnosisType)}
-          </div>
-
-          <p className="mt-5 text-lg font-extrabold leading-8">
-            年会費無料で、初めての1枚としても選びやすいカードです。
+          <p className="mt-5 text-lg font-black leading-8">
+            エポスカードが候補になります
           </p>
 
           <p className="mt-3 leading-8 text-slate-700">
-            エポスカードは年会費無料で、最短即日発行にも対応しています。
-            審査に不安がある方や、早めにカードを用意したい方の候補になります。
+            今の状況だと、年会費無料・初めてでも選びやすい・最短即日発行に対応しているカードが候補になります。
+            エポスカードは、まず1枚持ちたい方にも検討しやすいカードです。
+          </p>
+        </div>
+
+        <div className="mt-5 rounded-2xl bg-slate-50 p-4">
+          <p className="font-black text-slate-900">
+            いきなり申し込むのが不安な方へ
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            まずは公式サイトで、最新の条件・特典・発行内容を確認するだけでもOKです。
+            申し込み前に内容を確認してから判断できます。
           </p>
         </div>
 
         <div className="mt-5 grid gap-3">
           <Benefit>年会費無料</Benefit>
           <Benefit>最短即日発行に対応</Benefit>
-          <Benefit>初めてのクレジットカードとして選びやすい</Benefit>
+          <Benefit>初めての1枚として選びやすい</Benefit>
         </div>
 
         <div className="mt-5 rounded-2xl bg-slate-50 p-4 text-sm leading-7 text-slate-600">
@@ -334,12 +351,15 @@ function ResultSection({
           ※最新の条件・特典・発行可否は必ず公式サイトでご確認ください。
         </div>
 
-        <div className="mt-6 rounded-3xl bg-white p-5 text-center shadow ring-1 ring-slate-100">
-          <p className="font-black">
-            まずは公式サイトで条件を確認してください
+        <div className="mt-6 rounded-[24px] bg-white p-5 text-center shadow ring-1 ring-slate-100">
+          <p className="text-lg font-black">
+            まずは公式サイトで
+            <br />
+            最新条件を確認してください
           </p>
-          <p className="mt-2 text-sm text-slate-600">
-            申し込み前に、最新の発行条件・特典内容を確認できます。
+
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            最短即日発行に対応しているため、急ぎの方は早めの確認がおすすめです。
           </p>
 
           <div className="mt-4 flex justify-center">
@@ -360,13 +380,6 @@ function ResultSection({
       </div>
     </section>
   );
-}
-
-function getDiagnosisLabel(type: string) {
-  if (type === 'speed') return '急ぎで使いたい人向け';
-  if (type === 'easy') return '審査が不安な人向け';
-  if (type === 'free') return '年会費無料重視向け';
-  return 'バランス重視向け';
 }
 
 function Benefit({ children }: { children: React.ReactNode }) {
@@ -435,15 +448,20 @@ function A8EposBanner() {
 }
 
 function Question({
+  step,
   title,
   children,
 }: {
+  step: string;
   title: string;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <h2 className="text-lg font-black text-slate-900">{title}</h2>
+      <p className="text-xs font-black tracking-widest text-[#0f5f45]">
+        {step}
+      </p>
+      <h2 className="mt-1 text-lg font-black text-slate-900">{title}</h2>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">{children}</div>
     </div>
   );
@@ -463,7 +481,7 @@ function Choice({
       onClick={onClick}
       className={`rounded-2xl border px-4 py-4 text-left font-bold transition ${
         selected
-          ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-sm'
+          ? 'border-[#0f5f45] bg-emerald-50 text-[#0f5f45] shadow-sm'
           : 'border-slate-200 bg-white hover:bg-slate-50'
       }`}
     >
