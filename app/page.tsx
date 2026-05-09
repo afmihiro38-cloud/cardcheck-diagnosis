@@ -424,45 +424,63 @@ function ResultSection({
   return (
     <section className="mt-6">
       <div className="rounded-[28px] bg-white p-5 shadow-xl ring-1 ring-emerald-100">
-        <div className="rounded-[24px] bg-[#ecf6ef] p-5 text-center">
-          <p className="text-sm font-black text-[#0f5f45]">診断結果</p>
+        <div className="rounded-[24px] bg-[#ecf6ef] p-5">
+          <p className="text-center text-sm font-black text-[#0f5f45]">
+            診断レポート
+          </p>
 
-          <h2 className="mt-3 text-2xl font-black leading-tight sm:text-4xl">
-            あなたは
-            <br />
-            「{getDiagnosisLabel(diagnosisType)}」
-            <br />
-            です
-          </h2>
+          <div className="mt-4 rounded-2xl bg-white p-5 text-center shadow-sm">
+            <p className="text-sm font-bold text-slate-500">あなたのタイプ</p>
+            <h2 className="mt-2 text-2xl font-black leading-tight text-[#0f5f45] sm:text-4xl">
+              {getDiagnosisLabel(diagnosisType)}
+            </h2>
+          </div>
 
-          <div className="mt-5 rounded-2xl bg-white p-5 shadow-sm">
+          <div className="mt-4 rounded-2xl bg-white p-5 text-center shadow-sm">
             <p className="text-sm font-bold text-slate-500">おすすめ候補</p>
-            <p className="mt-1 text-3xl font-black text-[#0f5f45]">
+            <p className="mt-2 text-3xl font-black text-slate-900">
               エポスカード
+            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              年会費無料・最短即日発行対応で、初めての1枚としても検討しやすいカードです。
             </p>
           </div>
         </div>
 
-        <div className="mt-5 rounded-2xl bg-slate-50 p-4">
-          <p className="font-black text-slate-900">
-            あなたの場合は、まず「選びやすさ」が大切です
+        <div className="mt-5 rounded-2xl border border-emerald-100 bg-white p-5">
+          <p className="text-lg font-black text-slate-900">
+            あなたにエポスカードが合いやすい理由
           </p>
-          <p className="mt-2 text-sm leading-7 text-slate-600">
-            年会費無料・最短即日発行対応・初めてでも検討しやすい点から、
-            エポスカードが候補になります。
+
+          <div className="mt-4 space-y-3">
+            <ReasonCard
+              title="年会費無料で始めやすい"
+              text="維持費をかけずに持てるため、初めてカードを作る方でも検討しやすいです。"
+            />
+            <ReasonCard
+              title="最短即日発行に対応"
+              text="急ぎでカードを使いたい方にも候補になります。"
+            />
+            <ReasonCard
+              title="初心者でも選びやすい"
+              text="複雑な条件よりも、まず1枚持ちたい方に向きやすいカードです。"
+            />
+          </div>
+        </div>
+
+        <div className="mt-5 rounded-2xl bg-amber-50 p-5 text-sm leading-7 text-amber-900">
+          <p className="font-black">申し込みが不安な方へ</p>
+          <p className="mt-2">
+            いきなり申し込まなくても大丈夫です。まずは公式サイトで、最新条件・特典・発行内容を確認してから判断できます。
           </p>
         </div>
 
-        <div className="mt-5 grid gap-3">
-          <Benefit>年会費無料</Benefit>
-          <Benefit>最短即日発行に対応</Benefit>
-          <Benefit>初めての1枚として選びやすい</Benefit>
-        </div>
-
-        <div className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm leading-7 text-amber-900">
-          <b>いきなり申し込むのが不安な方へ</b>
+        <div className="mt-5 rounded-2xl bg-slate-50 p-4 text-xs leading-6 text-slate-600">
+          ※この診断は一般的な傾向をもとにした目安です。
           <br />
-          まずは公式サイトで、最新条件を確認するだけでもOKです。
+          ※審査結果・発行スピードを保証するものではありません。
+          <br />
+          ※最新の条件・特典・発行可否は必ず公式サイトでご確認ください。
         </div>
 
         <div className="mt-6 rounded-[24px] bg-white p-5 text-center shadow ring-1 ring-slate-100">
@@ -473,7 +491,7 @@ function ResultSection({
           </p>
 
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            最短即日発行に対応しているため、急ぎの方は早めの確認がおすすめです。
+            条件確認だけでもOKです。気になる方は公式情報を確認してから判断してください。
           </p>
 
           <div className="mt-4 flex justify-center">
@@ -493,6 +511,21 @@ function ResultSection({
         </button>
       </div>
     </section>
+  );
+}
+
+function ReasonCard({
+  title,
+  text,
+}: {
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="rounded-2xl bg-slate-50 p-4">
+      <p className="font-black text-slate-900">✅ {title}</p>
+      <p className="mt-2 text-sm leading-6 text-slate-600">{text}</p>
+    </div>
   );
 }
 
