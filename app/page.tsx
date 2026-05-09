@@ -483,25 +483,42 @@ function ResultSection({
           ※最新の条件・特典・発行可否は必ず公式サイトでご確認ください。
         </div>
 
-        <div className="mt-6 rounded-[24px] bg-white p-5 text-center shadow ring-1 ring-slate-100">
-          <p className="text-lg font-black">
-            まずは公式サイトで
-            <br />
-            最新条件を確認してください
-          </p>
+<div className="mt-6 overflow-hidden rounded-[24px] bg-[#063f2e] text-center shadow-xl">
+  <div className="bg-yellow-300 px-4 py-3">
+    <p className="text-sm font-black text-[#063f2e]">
+      いきなり申し込まなくてもOK
+    </p>
+  </div>
 
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            条件確認だけでもOKです。気になる方は公式情報を確認してから判断してください。
-          </p>
+  <div className="p-5">
+    <p className="text-xl font-black leading-snug text-white">
+      まずは公式サイトで
+      <br />
+      最新条件を確認してください
+    </p>
 
-          <div className="mt-4 flex justify-center">
-            <A8EposBanner />
-          </div>
+    <p className="mt-3 text-sm leading-7 text-emerald-50">
+      年会費・特典・発行スピードなどを確認してから判断できます。
+      急ぎの方は早めの確認がおすすめです。
+    </p>
 
-          <p className="mt-3 text-xs text-slate-500">
-            ※A8.netの広告リンクを使用しています
-          </p>
-        </div>
+    <div className="mt-5 rounded-2xl bg-white p-4 shadow-inner">
+      <p className="mb-3 text-sm font-black text-slate-900">
+        ↓ 公式サイトはこちら ↓
+      </p>
+
+      <div className="flex justify-center">
+        <A8EposBanner />
+      </div>
+    </div>
+
+    <p className="mt-3 text-xs leading-5 text-emerald-100">
+      ※A8.netの広告リンクを使用しています
+      <br />
+      ※最新条件・特典内容は公式サイトでご確認ください
+    </p>
+  </div>
+</div>
 
         <button
           onClick={onReset}
