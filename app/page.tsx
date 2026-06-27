@@ -325,34 +325,6 @@ function MockChoice({ text }: { text: string }) {
   );
 }
 
-function HeroMockChoice({
-  text,
-  active = false,
-}: {
-  text: string;
-  active?: boolean;
-}) {
-  return (
-    <div
-      className={`rounded-[20px] border p-4 text-sm font-bold shadow-sm ${
-        active
-          ? 'border-blue-600 bg-blue-50 text-blue-700'
-          : 'border-slate-200 bg-white text-slate-700'
-      }`}
-    >
-      ○ {text}
-    </div>
-  );
-}
-
-function HeroMiniCard({ title }: { title: string }) {
-  return (
-    <div className="rounded-[20px] bg-white p-4 text-center text-sm font-black text-slate-700 shadow-sm">
-      {title}
-    </div>
-  );
-}
-
 function QuestionScreen({
   step,
   currentQuestion,
@@ -715,22 +687,6 @@ function EditorPoint({
   );
 }
 
-function TypeCard({ title, stars }: { title: string; stars: string }) {
-  return (
-    <div className="rounded-[20px] border bg-white p-5 shadow-sm">
-      <p className="font-black">{title}</p>
-      <p className="mt-2 text-yellow-400">{stars}</p>
-    </div>
-  );
-}
-
-function Reason({ title }: { title: string }) {
-  return (
-    <div className="rounded-[20px] border bg-white p-5 text-center font-black shadow-sm">
-      {title}
-    </div>
-  );
-}
 
 function MainCta({ card }: { card: CardId }) {
   if (card === 'epos') {
