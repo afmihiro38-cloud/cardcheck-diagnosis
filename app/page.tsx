@@ -305,13 +305,13 @@ function AffiliateNotice() {
 
 function Hero({ onStart }: { onStart: () => void }) {
   return (
-    <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:py-24">
+    <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-16 md:grid-cols-2 md:py-24">
       <div>
-        <p className="text-sm font-bold tracking-[0.25em] text-blue-600">
-          cardcheck.jp
-        </p>
+        <div className="inline-flex rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700">
+          初心者向け・無料診断
+        </div>
 
-        <h1 className="mt-5 text-4xl font-black leading-tight tracking-tight md:text-6xl">
+        <h1 className="mt-6 text-4xl font-black leading-[1.12] tracking-tight text-slate-900 md:text-6xl">
           あなたに合う
           <br />
           クレジットカードを
@@ -319,33 +319,77 @@ function Hero({ onStart }: { onStart: () => void }) {
           <span className="text-blue-600">30秒で診断します。</span>
         </h1>
 
-        <p className="mt-6 text-base leading-8 text-slate-600">
-          初心者向けに、あなたの回答をもとにcardcheck編集部が定めた基準でカード候補を提案します。
+        <p className="mt-6 max-w-xl text-base leading-8 text-slate-600">
+          初めてのカード選びで迷っている方へ。
+          あなたの回答をもとに、cardcheck編集部が定めた基準で
+          選びやすいカード候補を提案します。
         </p>
 
-        <div className="mt-6 flex flex-wrap gap-2 text-sm font-bold text-blue-700">
-          <span className="rounded-full bg-blue-50 px-4 py-2">初心者向け</span>
-          <span className="rounded-full bg-blue-50 px-4 py-2">無料</span>
-          <span className="rounded-full bg-blue-50 px-4 py-2">安心</span>
+        <div className="mt-7 grid max-w-md grid-cols-3 gap-2 text-center text-sm font-bold text-blue-700">
+          <div className="rounded-[20px] bg-blue-50 px-3 py-3">
+            無料
+          </div>
+          <div className="rounded-[20px] bg-blue-50 px-3 py-3">
+            個人情報不要
+          </div>
+          <div className="rounded-[20px] bg-blue-50 px-3 py-3">
+            30秒
+          </div>
         </div>
 
         <button
           onClick={onStart}
-          className="mt-8 rounded-[20px] bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-sm transition hover:scale-[1.02] hover:bg-blue-700 hover:shadow-md"
+          className="mt-8 inline-flex w-full items-center justify-center rounded-[20px] bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-sm transition hover:scale-[1.02] hover:bg-blue-700 hover:shadow-md sm:w-auto"
         >
           無料で診断する
         </button>
+
+        <p className="mt-4 text-sm leading-7 text-slate-500">
+          診断結果は目安です。申し込みは任意で、審査結果を保証するものではありません。
+        </p>
       </div>
 
-      <div className="rounded-[28px] bg-[#f8fafc] p-6 shadow-sm">
-        <div className="rounded-[24px] bg-white p-5 shadow-sm">
-          <p className="text-sm font-bold text-blue-600">診断画面</p>
-          <div className="mt-5 space-y-3">
-            <MockLine width="w-10/12" />
-            <MockLine width="w-8/12" />
-            <MockChoice text="年会費無料を重視" />
-            <MockChoice text="ポイントを貯めたい" />
-            <MockChoice text="初めての1枚を探している" />
+      <div className="relative">
+        <div className="absolute -left-6 -top-6 hidden h-24 w-24 rounded-full bg-blue-100 blur-2xl md:block" />
+        <div className="absolute -bottom-8 -right-6 hidden h-32 w-32 rounded-full bg-slate-100 blur-2xl md:block" />
+
+        <div className="relative rounded-[28px] border border-slate-200 bg-[#f8fafc] p-5 shadow-sm">
+          <div className="rounded-[24px] bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-black text-blue-600">
+                cardcheck診断
+              </p>
+              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
+                30秒
+              </span>
+            </div>
+
+            <div className="mt-6">
+              <p className="text-sm font-bold text-slate-500">
+                質問 2 / 7
+              </p>
+
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-full w-4/12 rounded-full bg-blue-600" />
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <div className="h-4 w-10/12 rounded-full bg-slate-100" />
+              <div className="mt-3 h-4 w-7/12 rounded-full bg-slate-100" />
+            </div>
+
+            <div className="mt-6 space-y-3">
+              <HeroMockChoice active text="年会費無料を重視したい" />
+              <HeroMockChoice text="ポイントを貯めたい" />
+              <HeroMockChoice text="まずは最初の1枚を探している" />
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-3">
+            <HeroMiniCard title="初心者" />
+            <HeroMiniCard title="無料" />
+            <HeroMiniCard title="安心" />
           </div>
         </div>
       </div>
@@ -361,6 +405,34 @@ function MockChoice({ text }: { text: string }) {
   return (
     <div className="rounded-[20px] border border-slate-200 bg-white p-4 text-sm font-bold text-slate-700">
       ○ {text}
+    </div>
+  );
+}
+
+function HeroMockChoice({
+  text,
+  active = false,
+}: {
+  text: string;
+  active?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-[20px] border p-4 text-sm font-bold shadow-sm ${
+        active
+          ? 'border-blue-600 bg-blue-50 text-blue-700'
+          : 'border-slate-200 bg-white text-slate-700'
+      }`}
+    >
+      ○ {text}
+    </div>
+  );
+}
+
+function HeroMiniCard({ title }: { title: string }) {
+  return (
+    <div className="rounded-[20px] bg-white p-4 text-center text-sm font-black text-slate-700 shadow-sm">
+      {title}
     </div>
   );
 }
