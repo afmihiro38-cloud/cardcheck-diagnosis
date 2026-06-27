@@ -693,13 +693,34 @@ function Reason({ title }: { title: string }) {
 function MainCta({ card }: { card: CardId }) {
   if (card === 'epos') {
     return (
-      <div className="mt-8 rounded-[20px] bg-white p-6 text-center shadow-sm">
-        <h3 className="text-2xl font-black">エポスカード</h3>
-        <p className="mt-3 text-sm text-slate-600">
-          公式サイトで最新条件を確認してください。
-        </p>
-        <div className="mt-5 flex justify-center">
-          <A8EposBanner />
+      <div className="mt-8 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+        <div className="bg-blue-50 px-6 py-5 text-center">
+          <p className="text-sm font-black tracking-[0.2em] text-blue-600">
+            OFFICIAL SITE
+          </p>
+          <h3 className="mt-2 text-2xl font-black text-slate-900">
+            エポスカード
+          </h3>
+          <p className="mt-3 text-sm leading-7 text-slate-600">
+            公式サイトで、最新条件・特典・発行内容を確認できます。
+          </p>
+        </div>
+
+        <div className="p-6 text-center">
+          <div className="mb-4 rounded-[20px] bg-[#f8fafc] p-4 text-sm leading-7 text-slate-600">
+            いきなり申し込まなくても大丈夫です。
+            まずは公式サイトで条件を確認してから判断できます。
+          </div>
+
+          <div className="flex justify-center">
+            <A8EposBanner />
+          </div>
+
+          <p className="mt-4 text-xs leading-6 text-slate-500">
+            ※A8.netの広告リンクを使用しています。
+            <br />
+            ※診断結果は目安です。最新条件は公式サイトでご確認ください。
+          </p>
         </div>
       </div>
     );
@@ -709,25 +730,45 @@ function MainCta({ card }: { card: CardId }) {
   const name = card === 'rakuten' ? '楽天カード' : 'スルガJCBカード';
 
   return (
-    <div className="mt-8 rounded-[20px] bg-white p-6 text-center shadow-sm">
-      <h3 className="text-2xl font-black">{name}</h3>
-      <p className="mt-3 text-sm text-slate-600">
-        公式サイトで最新条件を確認してください。
-      </p>
-      <a
-        href={href}
-        target="_blank"
-        rel="nofollow sponsored noopener noreferrer"
-        onClick={() =>
-          track('affiliate_cta_click', {
-            card_name: card,
-            cta_position: 'main_result',
-          })
-        }
-        className="mt-5 inline-block rounded-[20px] bg-blue-600 px-8 py-4 font-black text-white shadow-sm transition hover:bg-blue-700 hover:shadow-md"
-      >
-        公式サイトを見る
-      </a>
+    <div className="mt-8 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+      <div className="bg-blue-50 px-6 py-5 text-center">
+        <p className="text-sm font-black tracking-[0.2em] text-blue-600">
+          OFFICIAL SITE
+        </p>
+        <h3 className="mt-2 text-2xl font-black text-slate-900">
+          {name}
+        </h3>
+        <p className="mt-3 text-sm leading-7 text-slate-600">
+          公式サイトで、最新条件・特典・申し込み内容を確認できます。
+        </p>
+      </div>
+
+      <div className="p-6 text-center">
+        <div className="mb-5 rounded-[20px] bg-[#f8fafc] p-4 text-sm leading-7 text-slate-600">
+          申し込みは任意です。まずは年会費・特典・発行条件を確認してから判断できます。
+        </div>
+
+        <a
+          href={href}
+          target="_blank"
+          rel="nofollow sponsored noopener noreferrer"
+          onClick={() =>
+            track('affiliate_cta_click', {
+              card_name: card,
+              cta_position: 'main_result',
+            })
+          }
+          className="inline-flex w-full items-center justify-center rounded-[20px] bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-sm transition hover:scale-[1.02] hover:bg-blue-700 hover:shadow-md sm:w-auto"
+        >
+          公式サイトを見る
+        </a>
+
+        <p className="mt-4 text-xs leading-6 text-slate-500">
+          ※広告リンクを使用しています。
+          <br />
+          ※診断結果は目安です。最新条件は公式サイトでご確認ください。
+        </p>
+      </div>
     </div>
   );
 }
