@@ -489,16 +489,63 @@ function QuestionChoiceCard({
 
 function Loading({ text }: { text: string }) {
   return (
-    <section className="mx-auto max-w-3xl px-5 py-16 text-center">
-      <div className="rounded-[20px] border bg-white p-8 shadow-sm">
-        <div className="mx-auto h-14 w-14 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
-        <p className="mt-6 text-sm font-bold text-blue-600">診断中...</p>
-        <h2 className="mt-3 text-2xl font-black">{text}</h2>
-        <div className="mx-auto mt-6 h-2 max-w-sm overflow-hidden rounded-full bg-slate-100">
-          <div className="h-full w-8/12 rounded-full bg-blue-600" />
+    <section className="mx-auto max-w-4xl px-5 py-12 md:py-16">
+      <div className="rounded-[28px] border border-slate-200 bg-white p-6 text-center shadow-sm md:p-10">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[24px] bg-blue-50">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
+        </div>
+
+        <p className="mt-6 text-sm font-black tracking-[0.2em] text-blue-600">
+          cardcheck診断
+        </p>
+
+        <h2 className="mt-3 text-2xl font-black leading-tight text-slate-900 md:text-4xl">
+          あなたに合うカード候補を
+          <br />
+          整理しています
+        </h2>
+
+        <p className="mt-4 text-sm leading-7 text-slate-500">
+          回答内容をもとに、cardcheck編集部が定めた基準で確認しています。
+        </p>
+
+        <div className="mx-auto mt-8 max-w-md rounded-[24px] bg-[#f8fafc] p-5 text-left">
+          <LoadingCheck active={text.includes('年会費')} text="年会費を確認しています" />
+          <LoadingCheck active={text.includes('ポイント')} text="ポイント還元を比較しています" />
+          <LoadingCheck active={text.includes('初心者')} text="初心者向けか確認しています" />
+          <LoadingCheck active={text.includes('候補')} text="あなた向けの候補を整理しています" />
+        </div>
+
+        <div className="mx-auto mt-6 h-2 max-w-md overflow-hidden rounded-full bg-slate-100">
+          <div className="h-full w-9/12 rounded-full bg-blue-600 transition-all" />
         </div>
       </div>
     </section>
+  );
+}
+
+function LoadingCheck({
+  text,
+  active,
+}: {
+  text: string;
+  active: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center gap-3 rounded-[18px] px-4 py-3 text-sm font-bold transition ${
+        active ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-400'
+      }`}
+    >
+      <span
+        className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-black ${
+          active ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-400'
+        }`}
+      >
+        {active ? '✓' : '・'}
+      </span>
+      {text}
+    </div>
   );
 }
 
@@ -519,80 +566,105 @@ function Result({
       : 'スルガJCBカード';
 
   return (
-    <section className="bg-[#f8fafc] px-5 py-10">
+    <section className="bg-[#f8fafc] px-5 py-10 md:py-14">
       <div className="mx-auto max-w-5xl">
-        <div className="rounded-[28px] bg-blue-50 p-6 text-center">
-          <p className="font-bold text-blue-600">診断完了</p>
-          <h2 className="mt-3 text-3xl font-black">
-            あなたにおすすめのカード
+        <div className="rounded-[28px] border border-blue-100 bg-white p-6 text-center shadow-sm md:p-10">
+          <p className="text-sm font-black tracking-[0.2em] text-blue-600">
+            診断完了
+          </p>
+
+          <h2 className="mt-4 text-3xl font-black leading-tight text-slate-900 md:text-5xl">
+            あなたにおすすめのカードは
+            <br />
+            <span className="text-blue-600">{main}</span>
+            です
           </h2>
 
-          <div className="mx-auto mt-6 max-w-md rounded-[20px] bg-white p-6 shadow-sm">
-            <p className="text-3xl font-black">{main}</p>
-            <p className="mt-2 text-2xl font-black text-blue-600">
-              {scores[mainCard]}点
-            </p>
-            <p className="mt-1 text-yellow-400">★★★★★</p>
-          </div>
-        </div>
-
-        <div className="mt-8 rounded-[20px] bg-white p-6 shadow-sm">
-          <h3 className="text-2xl font-black">あなたはこんなタイプでした</h3>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <TypeCard title="初心者" stars="★★★★★" />
-            <TypeCard title="年会費重視" stars="★★★★★" />
-            <TypeCard title="ポイント重視" stars="★★★★☆" />
-            <TypeCard title="旅行・優待" stars="★★☆☆☆" />
-          </div>
-
-          <p className="mt-5 leading-8 text-slate-600">
-            この結果から、現時点では <b>{main}</b> をおすすめ候補として表示しています。
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-slate-600 md:text-base">
+            回答内容をもとに、cardcheck編集部が定めた基準で候補を整理しました。
+            診断結果は目安として、申し込み前に公式サイトで最新条件をご確認ください。
           </p>
-        </div>
 
-        <div className="mt-8 rounded-[20px] bg-white p-6 shadow-sm">
-          <h3 className="text-2xl font-black">おすすめ理由</h3>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Reason title="年会費無料" />
-            <Reason title="ポイントが貯まりやすい" />
-            <Reason title="初めてでも使いやすい" />
-            <Reason title="普段使い向き" />
+          <div className="mx-auto mt-8 max-w-md rounded-[24px] bg-blue-50 p-6">
+            <p className="text-sm font-bold text-blue-700">おすすめスコア</p>
+            <p className="mt-2 text-5xl font-black text-blue-600">
+              {scores[mainCard]}
+              <span className="text-2xl">点</span>
+            </p>
+            <p className="mt-2 text-lg text-yellow-400">★★★★★</p>
           </div>
         </div>
 
-        <div className="mt-8 rounded-[20px] bg-yellow-50 p-6 text-yellow-900">
-          <h3 className="font-black">申し込み前に確認しましょう</h3>
-          <ul className="mt-3 space-y-2 text-sm leading-7">
+        <div className="mt-8 grid gap-5 md:grid-cols-2">
+          <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-2xl font-black text-slate-900">
+              あなたはこんなタイプでした
+            </h3>
+
+            <div className="mt-5 space-y-3">
+              <ResultTypeRow title="初心者向け" score="高い" level={5} />
+              <ResultTypeRow title="年会費重視" score="高い" level={5} />
+              <ResultTypeRow title="ポイント重視" score="やや高い" level={4} />
+              <ResultTypeRow title="旅行・優待" score="低め" level={2} />
+            </div>
+          </div>
+
+          <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-2xl font-black text-slate-900">
+              このカードをおすすめする理由
+            </h3>
+
+            <div className="mt-5 grid gap-3">
+              <ResultReason title="年会費無料" text="維持費をかけずに持ちやすく、初めての1枚として検討しやすいです。" />
+              <ResultReason title="普段使いに向きやすい" text="日常の買い物やネット利用など、幅広い場面で使いやすい候補です。" />
+              <ResultReason title="初心者でも選びやすい" text="難しい条件よりも、まず持ちやすさを重視したい方に向きやすいです。" />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 rounded-[24px] border border-yellow-200 bg-yellow-50 p-6 text-yellow-900 shadow-sm">
+          <h3 className="text-xl font-black">申し込み前に確認しましょう</h3>
+          <ul className="mt-4 space-y-2 text-sm leading-7">
             <li>・カード発行には審査があります。</li>
             <li>・必ず発行されるわけではありません。</li>
             <li>・ポイント制度や特典は変更される場合があります。</li>
+            <li>・最新条件は必ず公式サイトで確認してください。</li>
           </ul>
         </div>
 
         <MainCta card={mainCard} />
 
-        <div className="mt-8">
-          <h3 className="text-2xl font-black">他の候補</h3>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <SubCard title="スルガJCBカード" score="84点" text="JCB希望ならおすすめ" />
-            <SubCard title="エポスカード" score="80点" text="旅行・優待を重視する方向け" />
+        <div className="mt-10">
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-black tracking-[0.2em] text-blue-600">
+                OTHER OPTIONS
+              </p>
+              <h3 className="mt-2 text-2xl font-black text-slate-900">
+                他の候補
+              </h3>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <SubCard title="スルガJCBカード" score="84点" text="JCBブランドを希望する方の候補になります。" />
+            <SubCard title="エポスカード" score="80点" text="旅行・優待や即日発行を重視する方の候補になります。" />
           </div>
         </div>
 
         <FAQ />
 
-        <div className="mt-8 rounded-[20px] bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
           <h3 className="text-xl font-black">cardcheck編集部</h3>
           <p className="mt-3 leading-8 text-slate-600">
             cardcheck編集部では、初心者向けにクレジットカード情報をわかりやすく発信しています。
+            診断結果は一般的な基準に基づく目安としてご利用ください。
           </p>
         </div>
 
         <button
           onClick={onReset}
-          className="mt-8 w-full rounded-[20px] border bg-white px-6 py-4 font-black shadow-sm transition hover:shadow-md"
+          className="mt-8 w-full rounded-[20px] border border-slate-200 bg-white px-6 py-4 font-black shadow-sm transition hover:shadow-md"
         >
           もう一度診断する
         </button>
