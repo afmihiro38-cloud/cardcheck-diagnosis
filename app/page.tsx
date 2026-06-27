@@ -654,22 +654,64 @@ function Result({
 
         <FAQ />
 
-        <div className="mt-8 rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-xl font-black">cardcheck編集部</h3>
-          <p className="mt-3 leading-8 text-slate-600">
-            cardcheck編集部では、初心者向けにクレジットカード情報をわかりやすく発信しています。
-            診断結果は一般的な基準に基づく目安としてご利用ください。
-          </p>
-        </div>
+        <EditorBox />
 
-        <button
-          onClick={onReset}
-          className="mt-8 w-full rounded-[20px] border border-slate-200 bg-white px-6 py-4 font-black shadow-sm transition hover:shadow-md"
-        >
-          もう一度診断する
-        </button>
+<div className="mt-8 rounded-[24px] border border-slate-200 bg-white p-6 text-center shadow-sm">
+  <p className="text-sm font-bold text-slate-500">
+    回答を変えて、別の候補も確認できます。
+  </p>
+
+  <button
+    onClick={onReset}
+    className="mt-4 w-full rounded-[20px] border border-slate-200 bg-white px-6 py-4 font-black text-slate-900 shadow-sm transition hover:scale-[1.02] hover:shadow-md sm:w-auto"
+  >
+    もう一度診断する
+  </button>
+</div>
       </div>
     </section>
+  );
+}
+
+function EditorBox() {
+  return (
+    <div className="mt-10 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+      <div className="bg-[#f8fafc] p-6 md:p-8">
+        <p className="text-sm font-black tracking-[0.2em] text-blue-600">
+          EDITORIAL POLICY
+        </p>
+
+        <h3 className="mt-2 text-2xl font-black text-slate-900">
+          cardcheck編集部について
+        </h3>
+
+        <p className="mt-4 max-w-3xl text-sm leading-8 text-slate-600">
+          cardcheck編集部では、初めてクレジットカードを選ぶ方にもわかりやすいよう、
+          年会費・使いやすさ・ポイント・初心者向けかどうかなどを整理して情報発信しています。
+        </p>
+      </div>
+
+      <div className="grid gap-0 border-t border-slate-200 md:grid-cols-3">
+        <EditorPoint title="初心者向け" text="難しい専門用語をできるだけ避けて説明します。" />
+        <EditorPoint title="比較しやすく整理" text="年会費や使いやすさなど、選び方の軸を整理します。" />
+        <EditorPoint title="申し込みは任意" text="診断結果は目安であり、申し込みを強制するものではありません。" />
+      </div>
+    </div>
+  );
+}
+
+function EditorPoint({
+  title,
+  text,
+}: {
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="border-b border-slate-200 p-6 md:border-b-0 md:border-r md:last:border-r-0">
+      <p className="font-black text-slate-900">{title}</p>
+      <p className="mt-2 text-sm leading-7 text-slate-600">{text}</p>
+    </div>
   );
 }
 
@@ -793,21 +835,62 @@ function SubCard({
 
 function FAQ() {
   const items = [
-    ['診断は無料ですか？', 'はい、無料で利用できます。'],
-    ['申し込み義務はありますか？', 'ありません。結果を見たあとに申し込まなくても大丈夫です。'],
-    ['診断結果以外のカードを選んでもいいですか？', 'もちろん問題ありません。診断結果はあくまで目安です。'],
-    ['審査に必ず通りますか？', 'いいえ。審査結果を保証するものではありません。'],
-    ['個人情報は必要ですか？', 'この診断では氏名や住所などの個人情報は入力不要です。'],
+    [
+      '診断は無料ですか？',
+      'はい、無料で利用できます。診断結果を見るために料金が発生することはありません。',
+    ],
+    [
+      '個人情報は必要ですか？',
+      'この診断では、氏名・住所・電話番号などの個人情報は入力不要です。',
+    ],
+    [
+      '申し込み義務はありますか？',
+      'ありません。診断結果を見たあと、申し込まずにページを閉じても問題ありません。',
+    ],
+    [
+      '診断結果以外のカードを選んでもいいですか？',
+      'もちろん問題ありません。診断結果は、カード選びに迷ったときの参考としてご利用ください。',
+    ],
+    [
+      '審査に必ず通りますか？',
+      'いいえ。クレジットカードには審査があり、診断結果は審査通過を保証するものではありません。',
+    ],
+    [
+      'どの基準でおすすめしていますか？',
+      '年会費、ポイント、使いやすさ、初心者向けかどうかなどをもとに、cardcheck編集部が定めた基準で候補を表示しています。',
+    ],
   ];
 
   return (
-    <div className="mt-8 rounded-[20px] bg-white p-6 shadow-sm">
-      <h3 className="text-2xl font-black">よくある質問</h3>
-      <div className="mt-5 space-y-3">
+    <div className="mt-10 rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+      <p className="text-sm font-black tracking-[0.2em] text-blue-600">
+        FAQ
+      </p>
+
+      <h3 className="mt-2 text-2xl font-black text-slate-900">
+        よくある質問
+      </h3>
+
+      <p className="mt-3 text-sm leading-7 text-slate-500">
+        診断前に不安になりやすい点をまとめました。
+      </p>
+
+      <div className="mt-6 space-y-3">
         {items.map(([q, a]) => (
-          <details key={q} className="rounded-[20px] border p-4">
-            <summary className="cursor-pointer font-black">{q}</summary>
-            <p className="mt-3 text-sm leading-7 text-slate-600">{a}</p>
+          <details
+            key={q}
+            className="group rounded-[20px] border border-slate-200 bg-[#f8fafc] p-5 transition hover:bg-white hover:shadow-sm"
+          >
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-black text-slate-900">
+              <span>{q}</span>
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-blue-600 shadow-sm transition group-open:rotate-45">
+                +
+              </span>
+            </summary>
+
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              {a}
+            </p>
           </details>
         ))}
       </div>
