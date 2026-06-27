@@ -463,6 +463,13 @@ function Loading({ text }: { text: string }) {
   return (
     <section className="mx-auto max-w-4xl px-5 py-12 md:py-16">
       <div className="rounded-[28px] border border-slate-200 bg-white p-6 text-center shadow-sm md:p-10">
+        <div className="mx-auto mb-6 max-w-md overflow-hidden rounded-[24px] bg-[#f8fafc]">
+  <img
+    src="/images/diagnosis-loading.png"
+    alt="カード候補を整理しています"
+    className="h-auto w-full object-cover"
+  />
+</div>
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[24px] bg-blue-50">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
         </div>
@@ -540,6 +547,13 @@ function Result({
   return (
     <section className="bg-[#f8fafc] px-5 py-10 md:py-14">
       <div className="mx-auto max-w-5xl">
+        <div className="mb-8 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
+  <img
+    src="/images/diagnosis-result.png"
+    alt="診断レポート"
+    className="h-auto w-full object-cover"
+  />
+</div>
         <div className="rounded-[28px] border border-blue-100 bg-white p-6 text-center shadow-sm md:p-10">
           <p className="text-sm font-black tracking-[0.2em] text-blue-600">
             診断完了
