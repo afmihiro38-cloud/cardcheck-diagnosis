@@ -155,9 +155,9 @@ function getScores(answers: Answers): Record<CardId, number> {
   if (answers.brand === 'jcb') score.suruga += 30;
 
   return {
-  rakuten: Math.min(score.rakuten, 100),
-  epos: Math.min(score.epos, 100),
-  suruga: Math.min(score.suruga, 100),
+  rakuten: Math.min(Math.max(score.rakuten, 88), 98),
+  epos: Math.min(Math.max(score.epos + 55, 78), 92),
+  suruga: Math.min(Math.max(score.suruga + 64, 74), 90),
 };
 }
 
