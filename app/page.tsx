@@ -236,7 +236,12 @@ export default function Home() {
     <main className="min-h-screen bg-white text-[#0f172a]">
       <AffiliateNotice />
 
-      {phase === 'hero' && <Hero onStart={start} />}
+      {phase === 'hero' && (
+  <>
+    <Hero onStart={start} />
+    <PreDiagnosisSections onStart={start} />
+  </>
+)}
 
 {phase === 'question' && (
   <QuestionScreen
@@ -270,6 +275,110 @@ function AffiliateNotice() {
         <b>広告・PRについて：</b>
         当サイトはアフィリエイト広告を利用しています。診断結果は一般的な傾向をもとにした目安であり、審査通過や発行を保証するものではありません。
       </div>
+    </div>
+  );
+}
+
+function PreDiagnosisSections({ onStart }: { onStart: () => void }) {
+  return (
+    <section className="mx-auto max-w-6xl px-5 pb-14">
+      <div className="grid gap-5 md:grid-cols-3">
+        <ValueCard
+          title="この診断で分かること"
+          items={[
+            'あなたに合うカード候補',
+            'おすすめする理由',
+            '重視すべきポイント',
+          ]}
+        />
+        <ValueCard
+          title="安心して使えます"
+          items={[
+            '診断は無料',
+            '個人情報の入力不要',
+            '申し込みは任意',
+          ]}
+        />
+        <ValueCard
+          title="初心者向けに整理"
+          items={[
+            '年会費を確認',
+            'ポイントを確認',
+            '使いやすさを確認',
+          ]}
+        />
+      </div>
+
+      <div className="mt-8 rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+        <div className="grid items-center gap-8 md:grid-cols-2">
+          <div>
+            <p className="text-sm font-black tracking-[0.2em] text-blue-600">
+              HOW IT WORKS
+            </p>
+            <h2 className="mt-3 text-3xl font-black leading-tight text-slate-900">
+              いくつかの質問に答えるだけで、
+              <br />
+              候補をわかりやすく整理します
+            </h2>
+            <p className="mt-4 text-sm leading-8 text-slate-600">
+              年会費、ポイント、使いやすさなど、初心者が迷いやすい項目をもとに、
+              cardcheck編集部の基準でカード候補を表示します。
+            </p>
+          </div>
+
+          <div className="rounded-[24px] bg-[#f8fafc] p-5">
+            <div className="rounded-[20px] bg-white p-5 shadow-sm">
+              <p className="text-sm font-black text-blue-600">
+                診断イメージ
+              </p>
+              <div className="mt-5 space-y-3">
+                <FlowRow number="1" text="質問に答える" />
+                <FlowRow number="2" text="条件を整理する" />
+                <FlowRow number="3" text="おすすめ候補を表示" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={onStart}
+          className="mt-8 w-full rounded-[20px] bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-sm transition hover:scale-[1.02] hover:bg-blue-700 hover:shadow-md sm:w-auto"
+        >
+          無料で診断を始める
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function ValueCard({
+  title,
+  items,
+}: {
+  title: string;
+  items: string[];
+}) {
+  return (
+    <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+      <h3 className="text-xl font-black text-slate-900">{title}</h3>
+      <div className="mt-4 space-y-3">
+        {items.map((item) => (
+          <p key={item} className="text-sm font-bold text-slate-600">
+            ✓ {item}
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FlowRow({ number, text }: { number: string; text: string }) {
+  return (
+    <div className="flex items-center gap-4 rounded-[18px] bg-[#f8fafc] p-4">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">
+        {number}
+      </div>
+      <p className="font-black text-slate-900">{text}</p>
     </div>
   );
 }
