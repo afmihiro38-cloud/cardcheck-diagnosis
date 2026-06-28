@@ -5,12 +5,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   ArrowRight,
   BadgeCheck,
-  CheckCircle2,
   Clock3,
-  CreditCard,
-  HelpCircle,
-  ShieldCheck,
-  Sparkles,
   UserRoundCheck,
 } from 'lucide-react';
 
@@ -136,7 +131,7 @@ function track(eventName: string, params: Record<string, any> = {}) {
   if (typeof window === 'undefined') return;
   window.gtag?.('event', eventName, {
     src: getSrc(),
-    page_type: 'diagnosis_lp_v6',
+    page_type: 'diagnosis_lp_v8',
     ...params,
   });
 }
@@ -159,7 +154,11 @@ function getScores(answers: Answers): Record<CardId, number> {
   if (answers.useCase === 'travel') score.epos += 18;
   if (answers.brand === 'jcb') score.suruga += 30;
 
-  return score;
+  return {
+  rakuten: Math.min(score.rakuten, 100),
+  epos: Math.min(score.epos, 100),
+  suruga: Math.min(score.suruga, 100),
+};
 }
 
 function getMainCard(scores: Record<CardId, number>): CardId {
