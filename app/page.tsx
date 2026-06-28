@@ -2,6 +2,17 @@
 
 import Script from 'next/script';
 import { useEffect, useMemo, useState } from 'react';
+import {
+  ShieldCheck,
+  Clock3,
+  UserRoundCheck,
+  CreditCard,
+  CheckCircle2,
+  HelpCircle,
+  BadgeCheck,
+  Sparkles,
+  ArrowRight,
+} from 'lucide-react';
 
 declare global {
   interface Window {
@@ -233,7 +244,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-[#0f172a]">
+    <main className="min-h-screen bg-white pb-24 text-[#0f172a] md:pb-0">
       <AffiliateNotice />
 
       {phase === 'hero' && (
@@ -264,6 +275,7 @@ export default function Home() {
           onReset={reset}
         />
       )}
+      {phase === 'hero' && <FloatingStartButton onStart={start} />}
     </main>
   );
 }
@@ -281,7 +293,7 @@ function AffiliateNotice() {
 
 function PreDiagnosisSections({ onStart }: { onStart: () => void }) {
   return (
-    <section className="mx-auto max-w-6xl px-5 pb-14">
+    <section className="mx-auto max-w-6xl px-4 pb-12 md:px-5 md:pb-16">
       <div className="grid gap-5 md:grid-cols-3">
         <ValueCard
           title="この診断で分かること"
@@ -385,13 +397,13 @@ function FlowRow({ number, text }: { number: string; text: string }) {
 
 function Hero({ onStart }: { onStart: () => void }) {
   return (
-    <section className="mx-auto max-w-5xl px-5 py-10 md:py-16">
+    <section className="mx-auto max-w-5xl px-4 py-6 md:px-5 md:py-16">
       <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
         <img
-          src="/images/diagnosis-hero.png"
-          alt="あなたに合うクレジットカードを30秒で無料診断"
-          className="h-auto w-full object-cover"
-        />
+  src="/images/diagnosis-hero.png"
+  alt="あなたに合うクレジットカードを30秒で無料診断"
+  className="h-auto w-full object-cover"
+/>
 
         <div className="bg-white p-5 text-center md:p-7">
           <button
@@ -434,6 +446,23 @@ function MockChoice({ text }: { text: string }) {
   );
 }
 
+function FloatingStartButton({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/90 px-4 py-3 shadow-lg backdrop-blur md:hidden">
+      <button
+        onClick={onStart}
+        className="w-full rounded-[20px] bg-blue-600 px-6 py-4 text-base font-black text-white shadow-sm transition active:scale-[0.98]"
+      >
+        無料で診断する
+      </button>
+
+      <p className="mt-2 text-center text-[11px] leading-5 text-slate-500">
+        個人情報不要・診断は無料です
+      </p>
+    </div>
+  );
+}
+
 function QuestionScreen({
   step,
   currentQuestion,
@@ -450,7 +479,7 @@ function QuestionScreen({
   const remaining = questions.length - step - 1;
 
   return (
-    <section className="mx-auto max-w-4xl px-5 py-10 md:py-14">
+    <section className="mx-auto max-w-4xl px-4 py-8 md:px-5 md:py-14">
       <div className="mb-6 text-center">
         <p className="text-sm font-bold tracking-[0.2em] text-blue-600">
           cardcheck diagnosis
@@ -654,7 +683,7 @@ function Result({
       : 'スルガJCBカード';
 
   return (
-    <section className="bg-[#f8fafc] px-5 py-10 md:py-14">
+    <section className="bg-[#f8fafc] px-4 py-8 md:px-5 md:py-14">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
   <img
