@@ -14,8 +14,8 @@ import {
   UserRoundCheck,
 } from 'lucide-react';
 
-const RAKUTEN_LINK = 'ここに楽天カードの広告リンク';
-const SURUGA_LINK = 'ここにスルガJCBカードの広告リンク';
+const RAKUTEN_LINK = 'https://af.moshimo.com/af/c/click?a_id=5526377&p_id=7276&pc_id=20877&pl_id=91971';
+const SURUGA_LINK = 'https://px.a8.net/svt/ejp?a8mat=4B3QB2+FUYPWY+5OWE+HV7V6';
 
 type AnswerKey =
   | 'status'
