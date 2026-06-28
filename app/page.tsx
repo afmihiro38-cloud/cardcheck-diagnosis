@@ -287,7 +287,7 @@ function Hero({ onStart }: { onStart: () => void }) {
     <section className="mx-auto max-w-5xl px-4 py-6 md:px-5 md:py-14">
       <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
         <img
-          src="/images/diagnosis-hero.png"
+          src="/images/diagnosis-hero-v2.png"
           alt="あなたに合うクレジットカードを30秒で無料診断"
           className="h-auto w-full object-cover"
         />
@@ -459,7 +459,7 @@ function Loading({ text }: { text: string }) {
       <div className="rounded-[28px] border border-slate-200 bg-white p-6 text-center shadow-sm md:p-10">
         <div className="mx-auto mb-6 max-w-md overflow-hidden rounded-[24px] bg-[#f8fafc]">
           <img
-            src="/images/diagnosis-loading.png"
+            src="/images/diagnosis-loading-v2.png"
             alt="カード候補を整理しています"
             className="h-auto w-full object-cover"
           />
@@ -529,7 +529,7 @@ function Result({
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
           <img
-            src="/images/diagnosis-result.png"
+            src="/images/diagnosis-result-v2.png"
             alt="診断レポート"
             className="h-auto w-full object-cover"
           />
