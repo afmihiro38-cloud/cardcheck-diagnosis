@@ -294,103 +294,129 @@ function AffiliateNotice() {
 function PreDiagnosisSections({ onStart }: { onStart: () => void }) {
   return (
     <section className="mx-auto max-w-6xl px-4 pb-12 md:px-5 md:pb-16">
-      <div className="grid gap-5 md:grid-cols-3">
-        <ValueCard
-          title="この診断で分かること"
-          items={[
-            'あなたに合うカード候補',
-            'おすすめする理由',
-            '重視すべきポイント',
-          ]}
-        />
-        <ValueCard
-          title="安心して使えます"
-          items={[
-            '診断は無料',
-            '個人情報の入力不要',
-            '申し込みは任意',
-          ]}
-        />
-        <ValueCard
-          title="初心者向けに整理"
-          items={[
-            '年会費を確認',
-            'ポイントを確認',
-            '使いやすさを確認',
-          ]}
-        />
-      </div>
-
-      <div className="mt-8 rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-        <div className="grid items-center gap-8 md:grid-cols-2">
+      <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+        <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr] md:items-center">
           <div>
-            <p className="text-sm font-black tracking-[0.2em] text-blue-600">
-              HOW IT WORKS
-            </p>
-            <h2 className="mt-3 text-3xl font-black leading-tight text-slate-900">
-              いくつかの質問に答えるだけで、
+            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700">
+              <ShieldCheck className="h-4 w-4" />
+              初心者向けのカード相談サービス
+            </div>
+
+            <h2 className="mt-5 text-3xl font-black leading-tight tracking-tight text-slate-900 md:text-4xl">
+              比較表を眺める前に、
               <br />
-              候補をわかりやすく整理します
+              まずは自分に合う条件を
+              <br />
+              整理しましょう。
             </h2>
-            <p className="mt-4 text-sm leading-8 text-slate-600">
-              年会費、ポイント、使いやすさなど、初心者が迷いやすい項目をもとに、
-              cardcheck編集部の基準でカード候補を表示します。
+
+            <p className="mt-5 max-w-2xl text-sm leading-8 text-slate-600 md:text-base">
+              cardcheckでは、年会費・ポイント・使いやすさ・初心者向けかどうかなどをもとに、
+              cardcheck編集部が定めた基準でカード候補を提案します。
             </p>
           </div>
 
           <div className="rounded-[24px] bg-[#f8fafc] p-5">
-            <div className="rounded-[20px] bg-white p-5 shadow-sm">
-              <p className="text-sm font-black text-blue-600">
-                診断イメージ
-              </p>
-              <div className="mt-5 space-y-3">
-                <FlowRow number="1" text="質問に答える" />
-                <FlowRow number="2" text="条件を整理する" />
-                <FlowRow number="3" text="おすすめ候補を表示" />
-              </div>
+            <div className="grid gap-3">
+              <TrustPoint
+                icon={<CheckCircle2 className="h-5 w-5" />}
+                title="診断は無料"
+                text="料金はかかりません。気軽に試せます。"
+              />
+              <TrustPoint
+                icon={<UserRoundCheck className="h-5 w-5" />}
+                title="個人情報の入力不要"
+                text="氏名・住所・電話番号は入力不要です。"
+              />
+              <TrustPoint
+                icon={<BadgeCheck className="h-5 w-5" />}
+                title="申し込みは任意"
+                text="結果を見たあと、申し込まなくても大丈夫です。"
+              />
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="mt-5 grid gap-5 md:grid-cols-3">
+        <TrustCard
+          icon={<CreditCard className="h-6 w-6" />}
+          title="カード候補が分かる"
+          text="初めての方でも選びやすい候補を表示します。"
+        />
+        <TrustCard
+          icon={<HelpCircle className="h-6 w-6" />}
+          title="選ぶ理由が分かる"
+          text="なぜそのカードが候補になるのかを整理します。"
+        />
+        <TrustCard
+          icon={<Clock3 className="h-6 w-6" />}
+          title="約30秒で完了"
+          text="長い入力は不要。7問に答えるだけです。"
+        />
+      </div>
+
+      <div className="mt-8 rounded-[28px] border border-blue-100 bg-blue-50 p-6 text-center md:p-8">
+        <Sparkles className="mx-auto h-8 w-8 text-blue-600" />
+
+        <h3 className="mt-4 text-2xl font-black text-slate-900">
+          迷ったら、まずは無料診断へ
+        </h3>
+
+        <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+          診断結果はあくまで目安です。申し込み前に、公式サイトで最新条件を確認できます。
+        </p>
 
         <button
           onClick={onStart}
-          className="mt-8 w-full rounded-[20px] bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-sm transition hover:scale-[1.02] hover:bg-blue-700 hover:shadow-md sm:w-auto"
+          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-[20px] bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-sm transition hover:scale-[1.02] hover:bg-blue-700 hover:shadow-md sm:w-auto"
         >
           無料で診断を始める
+          <ArrowRight className="h-5 w-5" />
         </button>
       </div>
     </section>
   );
 }
 
-function ValueCard({
+function TrustPoint({
+  icon,
   title,
-  items,
+  text,
 }: {
+  icon: React.ReactNode;
   title: string;
-  items: string[];
+  text: string;
 }) {
   return (
-    <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
-      <h3 className="text-xl font-black text-slate-900">{title}</h3>
-      <div className="mt-4 space-y-3">
-        {items.map((item) => (
-          <p key={item} className="text-sm font-bold text-slate-600">
-            ✓ {item}
-          </p>
-        ))}
+    <div className="flex gap-4 rounded-[20px] bg-white p-4 shadow-sm">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+        {icon}
+      </div>
+      <div>
+        <p className="font-black text-slate-900">{title}</p>
+        <p className="mt-1 text-sm leading-6 text-slate-600">{text}</p>
       </div>
     </div>
   );
 }
 
-function FlowRow({ number, text }: { number: string; text: string }) {
+function TrustCard({
+  icon,
+  title,
+  text,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+}) {
   return (
-    <div className="flex items-center gap-4 rounded-[18px] bg-[#f8fafc] p-4">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">
-        {number}
+    <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+      <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-blue-50 text-blue-600">
+        {icon}
       </div>
-      <p className="font-black text-slate-900">{text}</p>
+      <h3 className="mt-5 text-xl font-black text-slate-900">{title}</h3>
+      <p className="mt-3 text-sm leading-7 text-slate-600">{text}</p>
     </div>
   );
 }
