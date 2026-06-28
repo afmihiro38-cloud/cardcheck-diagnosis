@@ -534,38 +534,53 @@ function Result({
   return (
     <section className="bg-[#f8fafc] px-4 py-8 md:px-5 md:py-14">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-8 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
           <img
             src="/images/diagnosis-result-v2.png"
             alt="診断レポート"
             className="h-auto w-full object-cover"
           />
+
+          <div className="p-6 text-center md:p-10">
+            <p className="text-sm font-black tracking-[0.2em] text-blue-600">
+              診断完了
+            </p>
+
+            <h2 className="mt-4 text-3xl font-black leading-tight text-slate-900 md:text-5xl">
+              あなたは
+              <br />
+              <span className="text-blue-600">
+                初めてでも安心して選びたいタイプ
+              </span>
+              <br />
+              でした
+            </h2>
+
+            <p className="mx-auto mt-5 max-w-2xl text-sm leading-8 text-slate-600 md:text-base">
+              回答内容を見ると、年会費・使いやすさ・ポイントの分かりやすさを重視する傾向があります。
+              そのため、現時点では <b>{main}</b> をおすすめ候補として表示しています。
+            </p>
+          </div>
         </div>
 
-        <div className="rounded-[28px] border border-blue-100 bg-white p-6 text-center shadow-sm md:p-10">
+        <div className="mt-8 rounded-[28px] border border-blue-100 bg-white p-6 text-center shadow-sm md:p-10">
           <p className="text-sm font-black tracking-[0.2em] text-blue-600">
-            診断完了
+            RECOMMENDED CARD
           </p>
 
-          <h2 className="mt-4 text-3xl font-black leading-tight text-slate-900 md:text-5xl">
-            あなたにおすすめのカードは
-            <br />
-            <span className="text-blue-600">{main}</span>
-            です
-          </h2>
+          <h3 className="mt-3 text-4xl font-black text-slate-900">
+            {main}
+          </h3>
 
-          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-slate-600 md:text-base">
-            回答内容をもとに、cardcheck編集部が定めた基準で候補を整理しました。
-            診断結果は目安として、申し込み前に公式サイトで最新条件をご確認ください。
-          </p>
-
-          <div className="mx-auto mt-8 max-w-md rounded-[24px] bg-blue-50 p-6">
+          <div className="mx-auto mt-6 max-w-md rounded-[24px] bg-blue-50 p-6">
             <p className="text-sm font-bold text-blue-700">おすすめスコア</p>
             <p className="mt-2 text-5xl font-black text-blue-600">
               {scores[mainCard]}
               <span className="text-2xl">点</span>
             </p>
-            <p className="mt-2 text-lg text-yellow-400">★★★★★</p>
+            <p className="mt-2 text-sm font-bold text-slate-500">
+              cardcheck編集部基準による目安です
+            </p>
           </div>
         </div>
 
