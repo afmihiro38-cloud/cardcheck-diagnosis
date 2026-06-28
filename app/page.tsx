@@ -1,33 +1,21 @@
 'use client';
 
 import Script from 'next/script';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
-  ShieldCheck,
-  Clock3,
-  UserRoundCheck,
-  CreditCard,
-  CheckCircle2,
-  HelpCircle,
-  BadgeCheck,
-  Sparkles,
   ArrowRight,
+  BadgeCheck,
+  CheckCircle2,
+  Clock3,
+  CreditCard,
+  HelpCircle,
+  ShieldCheck,
+  Sparkles,
+  UserRoundCheck,
 } from 'lucide-react';
 
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-    brandsafe_js_async?: (
-      url: string,
-      query: string,
-      id: string,
-      token: string
-    ) => void;
-  }
-}
-
-const RAKUTEN_LINK = 'https://af.moshimo.com/af/c/click?a_id=5526377&p_id=7276&pc_id=20877&pl_id=91971';
-const SURUGA_LINK = 'https://px.a8.net/svt/ejp?a8mat=4B3QB2+FUYPWY+5OWE+HV7V6';
+const RAKUTEN_LINK = 'ここに楽天カードの広告リンク';
+const SURUGA_LINK = 'ここにスルガJCBカードの広告リンク';
 
 type AnswerKey =
   | 'status'
@@ -42,7 +30,17 @@ type CardId = 'rakuten' | 'epos' | 'suruga';
 
 type Answers = Record<AnswerKey, string>;
 
-const BLUE = '#2563eb';
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+    brandsafe_js_async?: (
+      url: string,
+      query: string,
+      id: string,
+      token: string
+    ) => void;
+  }
+}
 
 const initialAnswers: Answers = {
   status: '',
@@ -54,72 +52,77 @@ const initialAnswers: Answers = {
   useCase: '',
 };
 
-const questions = [
+const questions: {
+  key: AnswerKey;
+  title: string;
+  hint: string;
+  choices: { value: string; label: string; desc: string }[];
+}[] = [
   {
-    key: 'status' as AnswerKey,
+    key: 'status',
     title: '現在の状況を教えてください',
-    hint: 'おすすめカードを絞り込みます。',
+    hint: 'あなたに近いものを選ぶと、候補を絞り込みやすくなります。',
     choices: [
-      ['student', '学生'],
-      ['worker', '会社員'],
-      ['housewife', '主婦・主夫'],
-      ['freeter', 'フリーター'],
+      { value: 'student', label: '学生', desc: '初めての1枚や年会費無料を重視しやすい方' },
+      { value: 'worker', label: '会社員', desc: '普段使い・ポイント・安心感をバランスよく見たい方' },
+      { value: 'housewife', label: '主婦・主夫', desc: '家計管理や日常の買い物で使いやすいカードを探したい方' },
+      { value: 'freeter', label: 'フリーター', desc: '年会費無料や申し込みやすさを重視したい方' },
     ],
   },
   {
-    key: 'firstCard' as AnswerKey,
+    key: 'firstCard',
     title: 'クレジットカードは初めてですか？',
-    hint: '初心者向けかどうかを判定します。',
+    hint: '初めての方には、分かりやすく使いやすいカードを優先します。',
     choices: [
-      ['yes', '初めて'],
-      ['no', 'すでに持っている'],
+      { value: 'yes', label: '初めて', desc: '最初の1枚として選びやすいカードを探したい' },
+      { value: 'no', label: 'すでに持っている', desc: '今のカードとは違う候補も見てみたい' },
     ],
   },
   {
-    key: 'annualFee' as AnswerKey,
+    key: 'annualFee',
     title: '年会費は重視しますか？',
-    hint: '維持費をかけたくない方は重視を選んでください。',
+    hint: '維持費をかけたくない場合は、年会費無料を重視しましょう。',
     choices: [
-      ['free', '年会費無料がいい'],
-      ['not_matter', 'そこまで気にしない'],
+      { value: 'free', label: '年会費無料がいい', desc: 'コストをかけずに持てるカードを優先したい' },
+      { value: 'not_matter', label: 'そこまで気にしない', desc: '特典や使いやすさも含めて考えたい' },
     ],
   },
   {
-    key: 'points' as AnswerKey,
+    key: 'points',
     title: 'ポイント還元は重視しますか？',
-    hint: '普段の買い物でポイントを貯めたいかを確認します。',
+    hint: '普段の買い物やネットショッピングでポイントを貯めたいかを確認します。',
     choices: [
-      ['high', '重視する'],
-      ['normal', '普通でいい'],
+      { value: 'high', label: '重視する', desc: '日常の支払いでポイントを貯めたい' },
+      { value: 'normal', label: '普通でいい', desc: 'ポイントよりも使いやすさや安心感を重視したい' },
     ],
   },
   {
-    key: 'speed' as AnswerKey,
+    key: 'speed',
     title: 'すぐに使いたいですか？',
-    hint: '急ぎの場合は発行スピードも考慮します。',
+    hint: '急ぎの場合は、発行スピードも候補選びに影響します。',
     choices: [
-      ['fast', 'できるだけ早く使いたい'],
-      ['normal', '急ぎではない'],
+      { value: 'fast', label: 'できるだけ早く使いたい', desc: '急ぎでカードを準備したい' },
+      { value: 'normal', label: '急ぎではない', desc: '条件を見ながらじっくり選びたい' },
     ],
   },
   {
-    key: 'brand' as AnswerKey,
+    key: 'brand',
     title: '国際ブランドの希望はありますか？',
-    hint: 'JCB希望などがあれば反映します。',
+    hint: 'JCB希望などがあれば、候補に反映します。',
     choices: [
-      ['jcb', 'JCBがいい'],
-      ['any', 'こだわりなし'],
+      { value: 'jcb', label: 'JCBがいい', desc: 'JCBブランドを希望している' },
+      { value: 'any', label: 'こだわりなし', desc: 'ブランドよりも総合的な使いやすさを重視したい' },
     ],
   },
   {
-    key: 'useCase' as AnswerKey,
+    key: 'useCase',
     title: '主にどんな場面で使いたいですか？',
-    hint: '普段使い・旅行・ネット利用などを考慮します。',
+    hint: '利用シーンに合わせて、おすすめ候補を調整します。',
     choices: [
-      ['daily', '普段の買い物'],
-      ['online', 'ネットショッピング'],
-      ['travel', '旅行・優待'],
-      ['first', 'まずは最初の1枚'],
+      { value: 'daily', label: '普段の買い物', desc: 'スーパー・コンビニ・日用品などで使いたい' },
+      { value: 'online', label: 'ネットショッピング', desc: 'ネット通販やオンライン決済で使いたい' },
+      { value: 'travel', label: '旅行・優待', desc: '旅行や優待サービスも気になる' },
+      { value: 'first', label: 'まずは最初の1枚', desc: '迷わず使いやすい1枚を選びたい' },
     ],
   },
 ];
@@ -133,12 +136,12 @@ function track(eventName: string, params: Record<string, any> = {}) {
   if (typeof window === 'undefined') return;
   window.gtag?.('event', eventName, {
     src: getSrc(),
-    page_type: 'diagnosis_lp_v5',
+    page_type: 'diagnosis_lp_v6',
     ...params,
   });
 }
 
-function getScores(answers: Answers) {
+function getScores(answers: Answers): Record<CardId, number> {
   const score: Record<CardId, number> = {
     rakuten: 70,
     epos: 20,
@@ -152,10 +155,8 @@ function getScores(answers: Answers) {
   if (answers.status === 'housewife') score.rakuten += 8;
   if (answers.useCase === 'online') score.rakuten += 12;
   if (answers.useCase === 'first') score.rakuten += 10;
-
   if (answers.speed === 'fast') score.epos += 18;
   if (answers.useCase === 'travel') score.epos += 18;
-
   if (answers.brand === 'jcb') score.suruga += 30;
 
   return score;
@@ -165,12 +166,16 @@ function getMainCard(scores: Record<CardId, number>): CardId {
   return Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0] as CardId;
 }
 
+function getCardName(card: CardId) {
+  if (card === 'rakuten') return '楽天カード';
+  if (card === 'epos') return 'エポスカード';
+  return 'スルガJCBカード';
+}
+
 export default function Home() {
   const [answers, setAnswers] = useState<Answers>(initialAnswers);
   const [step, setStep] = useState(0);
-  const [phase, setPhase] = useState<'hero' | 'question' | 'loading' | 'result'>(
-    'hero'
-  );
+  const [phase, setPhase] = useState<'hero' | 'question' | 'loading' | 'result'>('hero');
   const [loadingText, setLoadingText] = useState('年会費を確認しています');
 
   const currentQuestion = questions[step];
@@ -185,6 +190,7 @@ export default function Home() {
   const start = () => {
     setPhase('question');
     track('diagnosis_start_click');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const select = (key: AnswerKey, value: string) => {
@@ -204,7 +210,7 @@ export default function Home() {
         setPhase('loading');
         runLoading(next);
       }
-    }, 250);
+    }, 220);
   };
 
   const runLoading = (finalAnswers: Answers) => {
@@ -244,37 +250,22 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-white pb-24 text-[#0f172a] md:pb-0">
+    <main className="min-h-screen bg-white pb-24 text-slate-900 md:pb-0">
       <AffiliateNotice />
 
-      {phase === 'hero' && (
-  <>
-    <Hero onStart={start} />
-    <PreDiagnosisSections onStart={start} />
-  </>
-)}
-
-{phase === 'question' && (
-  <QuestionScreen
-    step={step}
-    currentQuestion={currentQuestion}
-    answers={answers}
-    progress={progress}
-    onSelect={select}
-  />
-)}
-
-      
-      
-      {phase === 'loading' && <Loading text={loadingText} />}
-
-      {phase === 'result' && (
-        <Result
-          mainCard={mainCard}
-          scores={scores}
-          onReset={reset}
+      {phase === 'hero' && <Hero onStart={start} />}
+      {phase === 'question' && (
+        <QuestionScreen
+          step={step}
+          currentQuestion={currentQuestion}
+          answers={answers}
+          progress={progress}
+          onSelect={select}
         />
       )}
+      {phase === 'loading' && <Loading text={loadingText} />}
+      {phase === 'result' && <Result mainCard={mainCard} scores={scores} onReset={reset} />}
+
       {phase === 'hero' && <FloatingStartButton onStart={start} />}
     </main>
   );
@@ -282,7 +273,7 @@ export default function Home() {
 
 function AffiliateNotice() {
   return (
-    <div className="mx-auto max-w-6xl px-5 pt-4">
+    <div className="mx-auto max-w-6xl px-4 pt-4 md:px-5">
       <div className="rounded-[20px] bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-900">
         <b>広告・PRについて：</b>
         当サイトはアフィリエイト広告を利用しています。診断結果は一般的な傾向をもとにした目安であり、審査通過や発行を保証するものではありません。
@@ -291,164 +282,29 @@ function AffiliateNotice() {
   );
 }
 
-function PreDiagnosisSections({ onStart }: { onStart: () => void }) {
-  return (
-    <section className="mx-auto max-w-6xl px-4 pb-12 md:px-5 md:pb-16">
-      <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-        <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr] md:items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700">
-              <ShieldCheck className="h-4 w-4" />
-              初心者向けのカード相談サービス
-            </div>
-
-            <h2 className="mt-5 text-3xl font-black leading-tight tracking-tight text-slate-900 md:text-4xl">
-              比較表を眺める前に、
-              <br />
-              まずは自分に合う条件を
-              <br />
-              整理しましょう。
-            </h2>
-
-            <p className="mt-5 max-w-2xl text-sm leading-8 text-slate-600 md:text-base">
-              cardcheckでは、年会費・ポイント・使いやすさ・初心者向けかどうかなどをもとに、
-              cardcheck編集部が定めた基準でカード候補を提案します。
-            </p>
-          </div>
-
-          <div className="rounded-[24px] bg-[#f8fafc] p-5">
-            <div className="grid gap-3">
-              <TrustPoint
-                icon={<CheckCircle2 className="h-5 w-5" />}
-                title="診断は無料"
-                text="料金はかかりません。気軽に試せます。"
-              />
-              <TrustPoint
-                icon={<UserRoundCheck className="h-5 w-5" />}
-                title="個人情報の入力不要"
-                text="氏名・住所・電話番号は入力不要です。"
-              />
-              <TrustPoint
-                icon={<BadgeCheck className="h-5 w-5" />}
-                title="申し込みは任意"
-                text="結果を見たあと、申し込まなくても大丈夫です。"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-5 grid gap-5 md:grid-cols-3">
-        <TrustCard
-          icon={<CreditCard className="h-6 w-6" />}
-          title="カード候補が分かる"
-          text="初めての方でも選びやすい候補を表示します。"
-        />
-        <TrustCard
-          icon={<HelpCircle className="h-6 w-6" />}
-          title="選ぶ理由が分かる"
-          text="なぜそのカードが候補になるのかを整理します。"
-        />
-        <TrustCard
-          icon={<Clock3 className="h-6 w-6" />}
-          title="約30秒で完了"
-          text="長い入力は不要。7問に答えるだけです。"
-        />
-      </div>
-
-      <div className="mt-8 rounded-[28px] border border-blue-100 bg-blue-50 p-6 text-center md:p-8">
-        <Sparkles className="mx-auto h-8 w-8 text-blue-600" />
-
-        <h3 className="mt-4 text-2xl font-black text-slate-900">
-          迷ったら、まずは無料診断へ
-        </h3>
-
-        <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-          診断結果はあくまで目安です。申し込み前に、公式サイトで最新条件を確認できます。
-        </p>
-
-        <button
-          onClick={onStart}
-          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-[20px] bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-sm transition hover:scale-[1.02] hover:bg-blue-700 hover:shadow-md sm:w-auto"
-        >
-          無料で診断を始める
-          <ArrowRight className="h-5 w-5" />
-        </button>
-      </div>
-    </section>
-  );
-}
-
-function TrustPoint({
-  icon,
-  title,
-  text,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  text: string;
-}) {
-  return (
-    <div className="flex gap-4 rounded-[20px] bg-white p-4 shadow-sm">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-        {icon}
-      </div>
-      <div>
-        <p className="font-black text-slate-900">{title}</p>
-        <p className="mt-1 text-sm leading-6 text-slate-600">{text}</p>
-      </div>
-    </div>
-  );
-}
-
-function TrustCard({
-  icon,
-  title,
-  text,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  text: string;
-}) {
-  return (
-    <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
-      <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-blue-50 text-blue-600">
-        {icon}
-      </div>
-      <h3 className="mt-5 text-xl font-black text-slate-900">{title}</h3>
-      <p className="mt-3 text-sm leading-7 text-slate-600">{text}</p>
-    </div>
-  );
-}
-
 function Hero({ onStart }: { onStart: () => void }) {
   return (
-    <section className="mx-auto max-w-5xl px-4 py-6 md:px-5 md:py-16">
+    <section className="mx-auto max-w-5xl px-4 py-6 md:px-5 md:py-14">
       <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
         <img
-  src="/images/diagnosis-hero260628.png"
-  alt="あなたに合うクレジットカードを30秒で無料診断"
-  className="h-auto w-full object-cover"
-/>
+          src="/images/diagnosis-hero.png"
+          alt="あなたに合うクレジットカードを30秒で無料診断"
+          className="h-auto w-full object-cover"
+        />
 
         <div className="bg-white p-5 text-center md:p-7">
           <button
             onClick={onStart}
-            className="w-full rounded-[20px] bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-sm transition hover:scale-[1.02] hover:bg-blue-700 hover:shadow-md sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-[20px] bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-sm transition hover:scale-[1.02] hover:bg-blue-700 hover:shadow-md sm:w-auto"
           >
             無料で診断する
+            <ArrowRight className="h-5 w-5" />
           </button>
 
           <div className="mx-auto mt-5 grid max-w-lg grid-cols-3 gap-2 text-center text-xs font-bold text-blue-700 sm:text-sm">
-            <div className="rounded-[20px] bg-blue-50 px-3 py-3">
-              無料
-            </div>
-            <div className="rounded-[20px] bg-blue-50 px-3 py-3">
-              個人情報不要
-            </div>
-            <div className="rounded-[20px] bg-blue-50 px-3 py-3">
-              30秒
-            </div>
+            <TrustBadge icon={<Clock3 className="h-4 w-4" />} text="30秒" />
+            <TrustBadge icon={<UserRoundCheck className="h-4 w-4" />} text="個人情報不要" />
+            <TrustBadge icon={<BadgeCheck className="h-4 w-4" />} text="無料" />
           </div>
 
           <p className="mx-auto mt-4 max-w-xl text-xs leading-6 text-slate-500 sm:text-sm">
@@ -460,31 +316,12 @@ function Hero({ onStart }: { onStart: () => void }) {
     </section>
   );
 }
-function MockLine({ width }: { width: string }) {
-  return <div className={`h-3 rounded-full bg-slate-100 ${width}`} />;
-}
 
-function MockChoice({ text }: { text: string }) {
+function TrustBadge({ icon, text }: { icon: ReactNode; text: string }) {
   return (
-    <div className="rounded-[20px] border border-slate-200 bg-white p-4 text-sm font-bold text-slate-700">
-      ○ {text}
-    </div>
-  );
-}
-
-function FloatingStartButton({ onStart }: { onStart: () => void }) {
-  return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/90 px-4 py-3 shadow-lg backdrop-blur md:hidden">
-      <button
-        onClick={onStart}
-        className="w-full rounded-[20px] bg-blue-600 px-6 py-4 text-base font-black text-white shadow-sm transition active:scale-[0.98]"
-      >
-        無料で診断する
-      </button>
-
-      <p className="mt-2 text-center text-[11px] leading-5 text-slate-500">
-        個人情報不要・診断は無料です
-      </p>
+    <div className="flex items-center justify-center gap-1 rounded-[20px] bg-blue-50 px-3 py-3">
+      {icon}
+      {text}
     </div>
   );
 }
@@ -507,15 +344,12 @@ function QuestionScreen({
   return (
     <section className="mx-auto max-w-4xl px-4 py-8 md:px-5 md:py-14">
       <div className="mb-6 text-center">
-        <p className="text-sm font-bold tracking-[0.2em] text-blue-600">
+        <p className="text-sm font-black tracking-[0.2em] text-blue-600">
           cardcheck diagnosis
         </p>
         <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-900 md:text-4xl">
           あなたに合うカードを絞り込みます
         </h1>
-        <p className="mt-3 text-sm leading-7 text-slate-500">
-          いくつかの質問に答えるだけで、初心者向けに選びやすい候補を表示します。
-        </p>
       </div>
 
       <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm md:p-7">
@@ -525,13 +359,12 @@ function QuestionScreen({
               質問 {step + 1} / {questions.length}
             </p>
             <p className="mt-1 text-sm text-slate-500">
-              {remaining > 0
-                ? `あと${remaining}問で診断結果を表示します`
-                : '最後の質問です'}
+              {remaining > 0 ? `あと${remaining}問で診断結果を表示します` : '最後の質問です'}
             </p>
           </div>
 
-          <div className="rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700">
+          <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700">
+            <Clock3 className="h-4 w-4" />
             約30秒で完了
           </div>
         </div>
@@ -550,9 +383,7 @@ function QuestionScreen({
         </div>
 
         <div className="mt-8 rounded-[24px] bg-[#f8fafc] p-5 md:p-6">
-          <p className="text-sm font-bold text-blue-600">
-            STEP {step + 1}
-          </p>
+          <p className="text-sm font-black text-blue-600">STEP {step + 1}</p>
 
           <h2 className="mt-3 text-2xl font-black leading-tight text-slate-900 md:text-3xl">
             {currentQuestion.title}
@@ -563,12 +394,13 @@ function QuestionScreen({
           </p>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {currentQuestion.choices.map(([value, label]) => (
+            {currentQuestion.choices.map((choice) => (
               <QuestionChoiceCard
-                key={value}
-                label={label}
-                selected={answers[currentQuestion.key] === value}
-                onClick={() => onSelect(currentQuestion.key, value)}
+                key={choice.value}
+                label={choice.label}
+                desc={choice.desc}
+                selected={answers[currentQuestion.key] === choice.value}
+                onClick={() => onSelect(currentQuestion.key, choice.value)}
               />
             ))}
           </div>
@@ -585,10 +417,12 @@ function QuestionScreen({
 
 function QuestionChoiceCard({
   label,
+  desc,
   selected,
   onClick,
 }: {
   label: string;
+  desc: string;
   selected: boolean;
   onClick: () => void;
 }) {
@@ -596,9 +430,7 @@ function QuestionChoiceCard({
     <button
       onClick={onClick}
       className={`group relative rounded-[20px] border bg-white p-5 text-left shadow-sm transition hover:scale-[1.02] hover:shadow-md ${
-        selected
-          ? 'border-blue-600 bg-blue-50 text-blue-700'
-          : 'border-slate-200 text-slate-900'
+        selected ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-900'
       }`}
     >
       <div className="flex items-start gap-4">
@@ -614,9 +446,7 @@ function QuestionChoiceCard({
 
         <div>
           <p className="text-lg font-black">{label}</p>
-          <p className="mt-1 text-sm leading-6 text-slate-500">
-            この条件をもとにおすすめ候補を調整します
-          </p>
+          <p className="mt-1 text-sm leading-6 text-slate-500">{desc}</p>
         </div>
       </div>
     </button>
@@ -625,15 +455,16 @@ function QuestionChoiceCard({
 
 function Loading({ text }: { text: string }) {
   return (
-    <section className="mx-auto max-w-4xl px-5 py-12 md:py-16">
+    <section className="mx-auto max-w-4xl px-4 py-12 md:px-5 md:py-16">
       <div className="rounded-[28px] border border-slate-200 bg-white p-6 text-center shadow-sm md:p-10">
         <div className="mx-auto mb-6 max-w-md overflow-hidden rounded-[24px] bg-[#f8fafc]">
-  <img
-    src="/images/diagnosis-loading260628.png"
-    alt="カード候補を整理しています"
-    className="h-auto w-full object-cover"
-  />
-</div>
+          <img
+            src="/images/diagnosis-loading.png"
+            alt="カード候補を整理しています"
+            className="h-auto w-full object-cover"
+          />
+        </div>
+
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[24px] bg-blue-50">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
         </div>
@@ -658,22 +489,12 @@ function Loading({ text }: { text: string }) {
           <LoadingCheck active={text.includes('初心者')} text="初心者向けか確認しています" />
           <LoadingCheck active={text.includes('候補')} text="あなた向けの候補を整理しています" />
         </div>
-
-        <div className="mx-auto mt-6 h-2 max-w-md overflow-hidden rounded-full bg-slate-100">
-          <div className="h-full w-9/12 rounded-full bg-blue-600 transition-all" />
-        </div>
       </div>
     </section>
   );
 }
 
-function LoadingCheck({
-  text,
-  active,
-}: {
-  text: string;
-  active: boolean;
-}) {
+function LoadingCheck({ text, active }: { text: string; active: boolean }) {
   return (
     <div
       className={`flex items-center gap-3 rounded-[18px] px-4 py-3 text-sm font-bold transition ${
@@ -701,23 +522,19 @@ function Result({
   scores: Record<CardId, number>;
   onReset: () => void;
 }) {
-  const main =
-    mainCard === 'rakuten'
-      ? '楽天カード'
-      : mainCard === 'epos'
-      ? 'エポスカード'
-      : 'スルガJCBカード';
+  const main = getCardName(mainCard);
 
   return (
     <section className="bg-[#f8fafc] px-4 py-8 md:px-5 md:py-14">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
-  <img
-    src="/images/diagnosis-result260628.png"
-    alt="診断レポート"
-    className="h-auto w-full object-cover"
-  />
-</div>
+          <img
+            src="/images/diagnosis-result.png"
+            alt="診断レポート"
+            className="h-auto w-full object-cover"
+          />
+        </div>
+
         <div className="rounded-[28px] border border-blue-100 bg-white p-6 text-center shadow-sm md:p-10">
           <p className="text-sm font-black tracking-[0.2em] text-blue-600">
             診断完了
@@ -746,184 +563,127 @@ function Result({
         </div>
 
         <div className="mt-8 grid gap-5 md:grid-cols-2">
-          <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-2xl font-black text-slate-900">
-              あなたはこんなタイプでした
-            </h3>
-
-            <div className="mt-5 space-y-3">
-              <ResultTypeRow title="初心者向け" score="高い" level={5} />
-              <ResultTypeRow title="年会費重視" score="高い" level={5} />
-              <ResultTypeRow title="ポイント重視" score="やや高い" level={4} />
-              <ResultTypeRow title="旅行・優待" score="低め" level={2} />
-            </div>
-          </div>
-
-          <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-2xl font-black text-slate-900">
-              このカードをおすすめする理由
-            </h3>
-
-            <div className="mt-5 grid gap-3">
-              <ResultReason title="年会費無料" text="維持費をかけずに持ちやすく、初めての1枚として検討しやすいです。" />
-              <ResultReason title="普段使いに向きやすい" text="日常の買い物やネット利用など、幅広い場面で使いやすい候補です。" />
-              <ResultReason title="初心者でも選びやすい" text="難しい条件よりも、まず持ちやすさを重視したい方に向きやすいです。" />
-            </div>
-          </div>
+          <ResultTypeCard />
+          <ResultReasonCard />
         </div>
 
-        <div className="mt-8 rounded-[24px] border border-yellow-200 bg-yellow-50 p-6 text-yellow-900 shadow-sm">
-          <h3 className="text-xl font-black">申し込み前に確認しましょう</h3>
-          <ul className="mt-4 space-y-2 text-sm leading-7">
-            <li>・カード発行には審査があります。</li>
-            <li>・必ず発行されるわけではありません。</li>
-            <li>・ポイント制度や特典は変更される場合があります。</li>
-            <li>・最新条件は必ず公式サイトで確認してください。</li>
-          </ul>
-        </div>
-
+        <NoticeBox />
         <MainCta card={mainCard} />
-
-        <div className="mt-10">
-          <div className="mb-4 flex items-end justify-between gap-4">
-            <div>
-              <p className="text-sm font-black tracking-[0.2em] text-blue-600">
-                OTHER OPTIONS
-              </p>
-              <h3 className="mt-2 text-2xl font-black text-slate-900">
-                他の候補
-              </h3>
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <SubCard title="スルガJCBカード" score="84点" text="JCBブランドを希望する方の候補になります。" />
-            <SubCard title="エポスカード" score="80点" text="旅行・優待や即日発行を重視する方の候補になります。" />
-          </div>
-        </div>
-
+        <OtherOptions />
         <FAQ />
-
         <EditorBox />
 
-<div className="mt-8 rounded-[24px] border border-slate-200 bg-white p-6 text-center shadow-sm">
-  <p className="text-sm font-bold text-slate-500">
-    回答を変えて、別の候補も確認できます。
-  </p>
-
-  <button
-    onClick={onReset}
-    className="mt-4 w-full rounded-[20px] border border-slate-200 bg-white px-6 py-4 font-black text-slate-900 shadow-sm transition hover:scale-[1.02] hover:shadow-md sm:w-auto"
-  >
-    もう一度診断する
-  </button>
-</div>
+        <div className="mt-8 rounded-[24px] border border-slate-200 bg-white p-6 text-center shadow-sm">
+          <p className="text-sm font-bold text-slate-500">
+            回答を変えて、別の候補も確認できます。
+          </p>
+          <button
+            onClick={onReset}
+            className="mt-4 w-full rounded-[20px] border border-slate-200 bg-white px-6 py-4 font-black text-slate-900 shadow-sm transition hover:scale-[1.02] hover:shadow-md sm:w-auto"
+          >
+            もう一度診断する
+          </button>
+        </div>
       </div>
     </section>
   );
 }
 
-function EditorBox() {
+function ResultTypeCard() {
   return (
-    <div className="mt-10 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
-      <div className="bg-[#f8fafc] p-6 md:p-8">
-        <p className="text-sm font-black tracking-[0.2em] text-blue-600">
-          EDITORIAL POLICY
-        </p>
-
-        <h3 className="mt-2 text-2xl font-black text-slate-900">
-          cardcheck編集部について
-        </h3>
-
-        <p className="mt-4 max-w-3xl text-sm leading-8 text-slate-600">
-          cardcheck編集部では、初めてクレジットカードを選ぶ方にもわかりやすいよう、
-          年会費・使いやすさ・ポイント・初心者向けかどうかなどを整理して情報発信しています。
-        </p>
-      </div>
-
-      <div className="grid gap-0 border-t border-slate-200 md:grid-cols-3">
-        <EditorPoint title="初心者向け" text="難しい専門用語をできるだけ避けて説明します。" />
-        <EditorPoint title="比較しやすく整理" text="年会費や使いやすさなど、選び方の軸を整理します。" />
-        <EditorPoint title="申し込みは任意" text="診断結果は目安であり、申し込みを強制するものではありません。" />
+    <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+      <h3 className="text-2xl font-black text-slate-900">
+        あなたはこんなタイプでした
+      </h3>
+      <div className="mt-5 space-y-3">
+        <ResultTypeRow title="初心者向け" score="高い" level={5} />
+        <ResultTypeRow title="年会費重視" score="高い" level={5} />
+        <ResultTypeRow title="ポイント重視" score="やや高い" level={4} />
+        <ResultTypeRow title="旅行・優待" score="低め" level={2} />
       </div>
     </div>
   );
 }
 
-function EditorPoint({
-  title,
-  text,
-}: {
-  title: string;
-  text: string;
-}) {
+function ResultReasonCard() {
   return (
-    <div className="border-b border-slate-200 p-6 md:border-b-0 md:border-r md:last:border-r-0">
-      <p className="font-black text-slate-900">{title}</p>
+    <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+      <h3 className="text-2xl font-black text-slate-900">
+        おすすめする理由
+      </h3>
+      <div className="mt-5 grid gap-3">
+        <ResultReason title="年会費無料" text="維持費をかけずに持ちやすく、初めての1枚として検討しやすいです。" />
+        <ResultReason title="普段使いに向きやすい" text="日常の買い物やネット利用など、幅広い場面で使いやすい候補です。" />
+        <ResultReason title="初心者でも選びやすい" text="難しい条件よりも、まず持ちやすさを重視したい方に向きやすいです。" />
+      </div>
+    </div>
+  );
+}
+
+function ResultTypeRow({ title, score, level }: { title: string; score: string; level: number }) {
+  return (
+    <div className="rounded-[20px] bg-[#f8fafc] p-4">
+      <div className="flex items-center justify-between gap-4">
+        <p className="font-black text-slate-900">{title}</p>
+        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">
+          {score}
+        </span>
+      </div>
+      <div className="mt-3 flex gap-1">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <span key={i} className={`h-2 flex-1 rounded-full ${i < level ? 'bg-blue-600' : 'bg-slate-200'}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ResultReason({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="rounded-[20px] bg-[#f8fafc] p-4">
+      <p className="font-black text-slate-900">✓ {title}</p>
       <p className="mt-2 text-sm leading-7 text-slate-600">{text}</p>
     </div>
   );
 }
 
+function NoticeBox() {
+  return (
+    <div className="mt-8 rounded-[24px] border border-yellow-200 bg-yellow-50 p-6 text-yellow-900 shadow-sm">
+      <h3 className="text-xl font-black">申し込み前に確認しましょう</h3>
+      <ul className="mt-4 space-y-2 text-sm leading-7">
+        <li>・カード発行には審査があります。</li>
+        <li>・必ず発行されるわけではありません。</li>
+        <li>・ポイント制度や特典は変更される場合があります。</li>
+        <li>・最新条件は必ず公式サイトで確認してください。</li>
+      </ul>
+    </div>
+  );
+}
 
 function MainCta({ card }: { card: CardId }) {
   if (card === 'epos') {
     return (
       <div className="mt-8 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
-        <div className="bg-blue-50 px-6 py-5 text-center">
-          <p className="text-sm font-black tracking-[0.2em] text-blue-600">
-            OFFICIAL SITE
-          </p>
-          <h3 className="mt-2 text-2xl font-black text-slate-900">
-            エポスカード
-          </h3>
-          <p className="mt-3 text-sm leading-7 text-slate-600">
-            公式サイトで、最新条件・特典・発行内容を確認できます。
-          </p>
-        </div>
-
+        <CtaHeader name="エポスカード" />
         <div className="p-6 text-center">
-          <div className="mb-4 rounded-[20px] bg-[#f8fafc] p-4 text-sm leading-7 text-slate-600">
-            いきなり申し込まなくても大丈夫です。
-            まずは公式サイトで条件を確認してから判断できます。
-          </div>
-
+          <CtaNote />
           <div className="flex justify-center">
             <A8EposBanner />
           </div>
-
-          <p className="mt-4 text-xs leading-6 text-slate-500">
-            ※A8.netの広告リンクを使用しています。
-            <br />
-            ※診断結果は目安です。最新条件は公式サイトでご確認ください。
-          </p>
         </div>
       </div>
     );
   }
 
   const href = card === 'rakuten' ? RAKUTEN_LINK : SURUGA_LINK;
-  const name = card === 'rakuten' ? '楽天カード' : 'スルガJCBカード';
+  const name = getCardName(card);
 
   return (
     <div className="mt-8 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
-      <div className="bg-blue-50 px-6 py-5 text-center">
-        <p className="text-sm font-black tracking-[0.2em] text-blue-600">
-          OFFICIAL SITE
-        </p>
-        <h3 className="mt-2 text-2xl font-black text-slate-900">
-          {name}
-        </h3>
-        <p className="mt-3 text-sm leading-7 text-slate-600">
-          公式サイトで、最新条件・特典・申し込み内容を確認できます。
-        </p>
-      </div>
-
+      <CtaHeader name={name} />
       <div className="p-6 text-center">
-        <div className="mb-5 rounded-[20px] bg-[#f8fafc] p-4 text-sm leading-7 text-slate-600">
-          申し込みは任意です。まずは年会費・特典・発行条件を確認してから判断できます。
-        </div>
-
+        <CtaNote />
         <a
           href={href}
           target="_blank"
@@ -934,100 +694,140 @@ function MainCta({ card }: { card: CardId }) {
               cta_position: 'main_result',
             })
           }
-          className="inline-flex w-full items-center justify-center rounded-[20px] bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-sm transition hover:scale-[1.02] hover:bg-blue-700 hover:shadow-md sm:w-auto"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-[20px] bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-sm transition hover:scale-[1.02] hover:bg-blue-700 hover:shadow-md sm:w-auto"
         >
           公式サイトを見る
+          <ArrowRight className="h-5 w-5" />
         </a>
-
-        <p className="mt-4 text-xs leading-6 text-slate-500">
-          ※広告リンクを使用しています。
-          <br />
-          ※診断結果は目安です。最新条件は公式サイトでご確認ください。
-        </p>
       </div>
     </div>
   );
 }
 
-function SubCard({
-  title,
-  score,
-  text,
-}: {
-  title: string;
-  score: string;
-  text: string;
-}) {
+function CtaHeader({ name }: { name: string }) {
   return (
-    <div className="rounded-[20px] bg-white p-5 shadow-sm">
+    <div className="bg-blue-50 px-6 py-5 text-center">
+      <p className="text-sm font-black tracking-[0.2em] text-blue-600">
+        OFFICIAL SITE
+      </p>
+      <h3 className="mt-2 text-2xl font-black text-slate-900">{name}</h3>
+      <p className="mt-3 text-sm leading-7 text-slate-600">
+        公式サイトで、最新条件・特典・申し込み内容を確認できます。
+      </p>
+    </div>
+  );
+}
+
+function CtaNote() {
+  return (
+    <div className="mb-5 rounded-[20px] bg-[#f8fafc] p-4 text-sm leading-7 text-slate-600">
+      申し込みは任意です。まずは年会費・特典・発行条件を確認してから判断できます。
+    </div>
+  );
+}
+
+function OtherOptions() {
+  return (
+    <div className="mt-10">
+      <p className="text-sm font-black tracking-[0.2em] text-blue-600">
+        OTHER OPTIONS
+      </p>
+      <h3 className="mt-2 text-2xl font-black text-slate-900">他の候補</h3>
+
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <SubCard title="スルガJCBカード" score="84点" text="JCBブランドを希望する方の候補になります。" />
+        <SubCard title="エポスカード" score="80点" text="旅行・優待や即日発行を重視する方の候補になります。" />
+      </div>
+    </div>
+  );
+}
+
+function SubCard({ title, score, text }: { title: string; score: string; text: string }) {
+  return (
+    <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
       <p className="text-xl font-black">{title}</p>
       <p className="mt-2 font-black text-blue-600">{score}</p>
-      <p className="mt-2 text-sm text-slate-600">{text}</p>
+      <p className="mt-2 text-sm leading-7 text-slate-600">{text}</p>
     </div>
   );
 }
 
 function FAQ() {
   const items = [
-    [
-      '診断は無料ですか？',
-      'はい、無料で利用できます。診断結果を見るために料金が発生することはありません。',
-    ],
-    [
-      '個人情報は必要ですか？',
-      'この診断では、氏名・住所・電話番号などの個人情報は入力不要です。',
-    ],
-    [
-      '申し込み義務はありますか？',
-      'ありません。診断結果を見たあと、申し込まずにページを閉じても問題ありません。',
-    ],
-    [
-      '診断結果以外のカードを選んでもいいですか？',
-      'もちろん問題ありません。診断結果は、カード選びに迷ったときの参考としてご利用ください。',
-    ],
-    [
-      '審査に必ず通りますか？',
-      'いいえ。クレジットカードには審査があり、診断結果は審査通過を保証するものではありません。',
-    ],
-    [
-      'どの基準でおすすめしていますか？',
-      '年会費、ポイント、使いやすさ、初心者向けかどうかなどをもとに、cardcheck編集部が定めた基準で候補を表示しています。',
-    ],
+    ['診断は無料ですか？', 'はい、無料で利用できます。診断結果を見るために料金が発生することはありません。'],
+    ['個人情報は必要ですか？', 'この診断では、氏名・住所・電話番号などの個人情報は入力不要です。'],
+    ['申し込み義務はありますか？', 'ありません。診断結果を見たあと、申し込まずにページを閉じても問題ありません。'],
+    ['審査に必ず通りますか？', 'いいえ。クレジットカードには審査があり、診断結果は審査通過を保証するものではありません。'],
   ];
 
   return (
     <div className="mt-10 rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-      <p className="text-sm font-black tracking-[0.2em] text-blue-600">
-        FAQ
-      </p>
-
-      <h3 className="mt-2 text-2xl font-black text-slate-900">
-        よくある質問
-      </h3>
-
-      <p className="mt-3 text-sm leading-7 text-slate-500">
-        診断前に不安になりやすい点をまとめました。
-      </p>
+      <p className="text-sm font-black tracking-[0.2em] text-blue-600">FAQ</p>
+      <h3 className="mt-2 text-2xl font-black text-slate-900">よくある質問</h3>
 
       <div className="mt-6 space-y-3">
         {items.map(([q, a]) => (
-          <details
-            key={q}
-            className="group rounded-[20px] border border-slate-200 bg-[#f8fafc] p-5 transition hover:bg-white hover:shadow-sm"
-          >
+          <details key={q} className="group rounded-[20px] border border-slate-200 bg-[#f8fafc] p-5 transition hover:bg-white hover:shadow-sm">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-black text-slate-900">
               <span>{q}</span>
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-blue-600 shadow-sm transition group-open:rotate-45">
                 +
               </span>
             </summary>
-
-            <p className="mt-4 text-sm leading-7 text-slate-600">
-              {a}
-            </p>
+            <p className="mt-4 text-sm leading-7 text-slate-600">{a}</p>
           </details>
         ))}
       </div>
+    </div>
+  );
+}
+
+function EditorBox() {
+  return (
+    <div className="mt-10 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+      <div className="bg-[#f8fafc] p-6 md:p-8">
+        <p className="text-sm font-black tracking-[0.2em] text-blue-600">
+          EDITORIAL POLICY
+        </p>
+        <h3 className="mt-2 text-2xl font-black text-slate-900">
+          cardcheck編集部について
+        </h3>
+        <p className="mt-4 max-w-3xl text-sm leading-8 text-slate-600">
+          cardcheck編集部では、初めてクレジットカードを選ぶ方にもわかりやすいよう、
+          年会費・使いやすさ・ポイント・初心者向けかどうかなどを整理して情報発信しています。
+        </p>
+      </div>
+
+      <div className="grid border-t border-slate-200 md:grid-cols-3">
+        <EditorPoint title="初心者向け" text="難しい専門用語をできるだけ避けて説明します。" />
+        <EditorPoint title="比較しやすく整理" text="年会費や使いやすさなど、選び方の軸を整理します。" />
+        <EditorPoint title="申し込みは任意" text="診断結果は目安であり、申し込みを強制するものではありません。" />
+      </div>
+    </div>
+  );
+}
+
+function EditorPoint({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="border-b border-slate-200 p-6 md:border-b-0 md:border-r md:last:border-r-0">
+      <p className="font-black text-slate-900">{title}</p>
+      <p className="mt-2 text-sm leading-7 text-slate-600">{text}</p>
+    </div>
+  );
+}
+
+function FloatingStartButton({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/90 px-4 py-3 shadow-lg backdrop-blur md:hidden">
+      <button
+        onClick={onStart}
+        className="w-full rounded-[20px] bg-blue-600 px-6 py-4 text-base font-black text-white shadow-sm transition active:scale-[0.98]"
+      >
+        無料で診断する
+      </button>
+      <p className="mt-2 text-center text-[11px] leading-5 text-slate-500">
+        個人情報不要・診断は無料です
+      </p>
     </div>
   );
 }
