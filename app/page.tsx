@@ -428,13 +428,15 @@ function QuestionChoiceCard({
   return (
     <button
       onClick={onClick}
-      className={`group relative rounded-[20px] border bg-white p-5 text-left shadow-sm transition hover:scale-[1.02] hover:shadow-md ${
-        selected ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-900'
+      className={`group relative w-full rounded-[24px] border p-5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98] ${
+        selected
+          ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-md'
+          : 'border-slate-200 bg-white text-slate-900'
       }`}
     >
       <div className="flex items-start gap-4">
         <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black ${
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-black transition-all duration-200 ${
             selected
               ? 'bg-blue-600 text-white'
               : 'bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600'
@@ -443,11 +445,17 @@ function QuestionChoiceCard({
           {selected ? '✓' : '○'}
         </div>
 
-        <div>
-          <p className="text-lg font-black">{label}</p>
-          <p className="mt-1 text-sm leading-6 text-slate-500">{desc}</p>
+        <div className="pr-8">
+          <p className="text-lg font-black leading-snug">{label}</p>
+          <p className="mt-2 text-sm leading-7 text-slate-500">{desc}</p>
         </div>
       </div>
+
+      {selected && (
+        <div className="absolute right-4 top-4 rounded-full bg-blue-600 px-3 py-1 text-xs font-black text-white">
+          選択中
+        </div>
+      )}
     </button>
   );
 }
